@@ -35,15 +35,17 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isSolid ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+        isSolid 
+          ? 'bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 py-4' 
+          : 'bg-transparent py-6'
       )}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link 
           href="/" 
           className={cn(
-            "text-2xl font-bold tracking-tighter transition-colors",
+            "text-2xl font-black tracking-tighter transition-colors flex items-center gap-2",
             isSolid ? "text-slate-900 dark:text-white" : "text-white"
           )}
         >
@@ -57,17 +59,24 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
               key={link.name}
               href={link.href}
               className={cn(
-                "font-medium hover:text-cyan-500 transition-colors",
-                isSolid ? "text-slate-700 dark:text-slate-200" : "text-white/90"
+                "text-sm font-medium tracking-wide uppercase hover:text-cyan-500 transition-colors relative group",
+                isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
               )}
             >
               {link.name}
+              <span className={cn(
+                "absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-500 transition-all duration-300 group-hover:w-full",
+                isSolid ? "" : "bg-white"
+              )} />
             </Link>
           ))}
           <ModeToggle />
           <Link
             href="/booking"
-            className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2 rounded-full font-medium transition-colors"
+            className={cn(
+              "px-6 py-2.5 rounded-full font-bold text-sm transition-all shadow-lg hover:shadow-cyan-500/25 active:scale-95",
+              "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white border border-transparent"
+            )}
           >
             Buchen
           </Link>

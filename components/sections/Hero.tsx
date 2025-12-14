@@ -16,7 +16,7 @@ export function Hero() {
           backgroundSize: "cover",
         }}
       >
-        <div className="absolute inset-0 bg-slate-900/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/80" />
       </div>
 
       <div className="relative z-10 container mx-auto px-6 text-center text-white">
@@ -25,26 +25,26 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-8 drop-shadow-lg">
             Dein Urlaub am <br />
-            <span className="text-cyan-400">Kemnader See</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">Kemnader See</span>
           </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light">
+          <p className="text-xl md:text-2xl text-slate-200 mb-12 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-md">
             Windsurfen, Stand Up Paddling & Longboarden. 
             Erlebe Wassersport mitten im Ruhrgebiet.
           </p>
           
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
             <Link 
               href="#kurse"
-              className="group bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold text-lg transition-all flex items-center gap-2"
+              className="group bg-cyan-500 hover:bg-cyan-400 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-cyan-500/40 hover:-translate-y-1 flex items-center gap-2"
             >
               Kurse entdecken
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link 
               href="/booking/verleih"
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all"
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1"
             >
               Equipment leihen
             </Link>

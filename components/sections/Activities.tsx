@@ -53,12 +53,13 @@ export function Activities() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               viewport={{ once: true }}
-              className="group relative bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-transparent dark:border-slate-800"
+              className="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-slate-800"
             >
               {/* Image Header */}
-              <div className="h-48 overflow-hidden">
+              <div className="h-56 overflow-hidden relative">
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors z-10" />
                 <div 
-                  className="w-full h-full bg-slate-200 dark:bg-slate-800 transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full bg-slate-200 dark:bg-slate-800 transition-transform duration-700 group-hover:scale-110"
                   style={{
                     backgroundImage: `url(${activity.image})`,
                     backgroundSize: 'cover',
@@ -68,20 +69,20 @@ export function Activities() {
               </div>
 
               <div className="p-8">
-                <div className={`w-12 h-12 ${activity.color} rounded-xl flex items-center justify-center text-white mb-6`}>
-                  <activity.icon size={24} />
+                <div className={`w-14 h-14 ${activity.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-cyan-500/20`}>
+                  <activity.icon size={28} />
                 </div>
                 
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">{activity.title}</h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3">
+                <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                   {activity.description}
                 </p>
 
                 <Link 
                   href={activity.link}
-                  className="inline-flex items-center text-cyan-600 dark:text-cyan-400 font-semibold group-hover:gap-2 transition-all"
+                  className="inline-flex items-center text-cyan-600 dark:text-cyan-400 font-bold tracking-wide uppercase text-sm group-hover:gap-2 transition-all"
                 >
-                  Mehr erfahren <span className="text-lg">→</span>
+                  Mehr erfahren <span className="text-lg ml-1">→</span>
                 </Link>
               </div>
             </motion.div>

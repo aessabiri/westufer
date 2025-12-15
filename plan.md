@@ -4,6 +4,25 @@ This document outlines the roadmap for Deployment, Payment Integration, and Tech
 
 ---
 
+## Phase 0: Essentials (Must-Have Before Launch)
+
+**Goal:** Ensure the site is legally compliant and functionally operational (not just a prototype).
+
+1.  **📧 Real Email System:**
+    *   **Problem:** Forms currently only show a "Success" message but don't send emails.
+    *   **Solution:** Integrate **Resend** or **Nodemailer** to deliver inquiries and confirmations to `info@westufer...`.
+2.  **📅 Dynamic Calendar:**
+    *   **Problem:** Booking dates are currently hardcoded mock data.
+    *   **Solution:** Move dates to a config file or CMS so availability can be managed.
+3.  **⚖️ Legal Compliance (Germany):**
+    *   **Problem:** Impressum & Datenschutz contain placeholder text.
+    *   **Solution:** Replace placeholders with valid legal texts to avoid *Abmahnung*.
+4.  **🍪 Cookie Consent:**
+    *   **Problem:** Analytics/Maps require consent in the EU.
+    *   **Solution:** Implement a compliant Cookie Banner.
+
+---
+
 ## Phase 1: Deployment (Live on Vercel)
 
 **Goal:** Point the existing domain (`westufer-kemnade.de`) to the Vercel-hosted website without disrupting existing email services.

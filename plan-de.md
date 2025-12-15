@@ -4,6 +4,25 @@ Dieses Dokument skizziert den Fahrplan für Deployment, Zahlungsintegration und 
 
 ---
 
+## Phase 0: Grundlagen (Muss vor dem Livegang stehen)
+
+**Ziel:** Sicherstellen, dass die Seite rechtssicher und funktional ist (kein reiner Prototyp).
+
+1.  **📧 Echtes E-Mail-System:**
+    *   **Problem:** Formulare zeigen nur "Erfolg" an, senden aber keine E-Mails.
+    *   **Lösung:** Integration von **Resend** oder **Nodemailer**, damit Anfragen und Bestätigungen bei `info@westufer...` ankommen.
+2.  **📅 Dynamischer Kalender:**
+    *   **Problem:** Buchungsdaten sind aktuell fest programmierte Dummy-Daten.
+    *   **Lösung:** Auslagerung der Daten in eine Config-Datei oder ein CMS, um Verfügbarkeiten zu verwalten.
+3.  **⚖️ Rechtssicherheit (Deutschland):**
+    *   **Problem:** Impressum & Datenschutz enthalten Platzhaltertexte.
+    *   **Lösung:** Ersetzen durch gültige Rechtstexte (Abmahngefahr vermeiden!).
+4.  **🍪 Cookie Consent:**
+    *   **Problem:** Analysetools/Maps benötigen in der EU eine Einwilligung.
+    *   **Lösung:** Implementierung eines DSGVO-konformen Cookie-Banners.
+
+---
+
 ## Phase 1: Deployment (Livegang auf Vercel)
 
 **Ziel:** Die bestehende Domain (`westufer-kemnade.de`) auf die neue Vercel-Website leiten, ohne den E-Mail-Empfang zu stören.

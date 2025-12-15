@@ -1,96 +1,61 @@
-# Deployment and Payment Integration Plan
+# Master Project Plan: Westufer Kemnade
 
-This document outlines the steps to deploy the Westufer Kemnade website online using Vercel and implement a robust payment system using Stripe, tailored for the German market.
+This document outlines the roadmap for Deployment, Payment Integration, and Technical Optimization.
 
 ---
 
-## Part 1: Connecting Your Existing Domain (`westufer-kemnade.de`)
+## Phase 1: Deployment (Live on Vercel)
 
-**Goal:** Point the existing domain to the Vercel-hosted website without disrupting existing email services.
+**Goal:** Point the existing domain (`westufer-kemnade.de`) to the Vercel-hosted website without disrupting existing email services.
 
-**Key Principle:** Avoid changing nameservers if email is hosted with your domain registrar. Only modify A Records and CNAMEs.
+**Key Principle:** Avoid changing nameservers if email is hosted with your domain registrar (Strato, IONOS, etc.). Only modify A Records and CNAMEs.
 
 **Steps:**
-
-1.  **In Vercel (after deployment of the project):**
-    *   Navigate to your Project Dashboard.
-    *   Go to **Settings** -> **Domains**.
-    *   Enter `westufer-kemnade.de` and click **Add**.
-    *   Vercel will provide specific **A Record** (IP Address) and **CNAME** values. Make a note of these.
-
-2.  **In Your Domain Registrar (e.g., Strato, IONOS, United Domains):**
-    *   Log in to your domain registrar's control panel.
-    *   Locate the **DNS Settings** or **DNS-Verwaltung** section.
-    *   **Modify the A Record for the Root Domain (`@` or your bare domain):**
-        *   Change the existing A Record value to the IP Address provided by Vercel (typically `76.76.21.21`).
-    *   **Modify the CNAME Record for the `www` Subdomain:**
-        *   Change the existing CNAME value for `www` to `cname.vercel-dns.com`.
-    *   **Save** the changes.
-
-3.  **Propagation Time:**
-    *   DNS changes can take anywhere from a few minutes to up to 24 hours to propagate across the internet. Vercel will automatically detect the change and issue a free SSL certificate (HTTPS) once the domain is correctly pointed.
+1.  **In Vercel:** Add `westufer-kemnade.de` to Project Settings -> Domains. Note the **A Record** (e.g., `76.76.21.21`).
+2.  **In Registrar (Strato/IONOS):**
+    *   Set **A Record** (@) to Vercel's IP.
+    *   Set **CNAME** (www) to `cname.vercel-dns.com`.
+3.  **Result:** Emails stay with the old host; Website traffic goes to the new Vercel app.
 
 ---
 
-## Part 2: Implementing the Payment System (Stripe)
+## Phase 2: Payment Integration (Stripe)
 
-**Goal:** Integrate a secure, German-standard payment system for booking courses and rentals.
-
-**Recommended Solution:** Stripe.
-
-**Why Stripe for Germany?**
-*   **Comprehensive Payment Methods:** Supports major credit cards (Visa, Mastercard), PayPal, SEPA Lastschrift, Giropay, and Sofort (Klarna) – all crucial for the German market.
-*   **Compliance:** Aids in handling German tax requirements (MwSt) and invoicing.
-*   **Security:** Offloads PCI compliance burden as Stripe handles sensitive payment information securely.
+**Goal:** Integrate a secure payment system supporting PayPal, SEPA, and Credit Cards (German Standard).
 
 **Implementation Plan:**
-
-1.  **Stripe Account Setup:**
-    *   Create a free Stripe account at [stripe.com](https://stripe.com).
-    *   From the Stripe Dashboard, navigate to **Settings -> Payment Methods**.
-    *   Enable all relevant German payment methods: **PayPal**, **SEPA Direct Debit**, **Giropay**, and **Sofort**.
-
-2.  **Install Necessary Libraries:**
-    *   Add the Stripe SDKs to the project:
-        ```bash
-        npm install stripe @stripe/stripe-js
-        ```
-
-3.  **Backend Integration (Next.js API Route):**
-    *   Create a server-side API endpoint, for example, `app/api/checkout/route.ts`.
-    *   This API route will:
-        *   Receive detailed booking information (e.g., selected courses/rentals, total price, customer details) from the frontend.
-        *   Use the Stripe Node.js library to create a **Stripe Checkout Session**. This session is a temporary, secure page hosted by Stripe.
-        *   Return the URL of this Stripe Checkout Session to the frontend.
-
-4.  **Frontend Integration (in `BookingWizard`):**
-    *   Modify the `handleSubmit` function in the `BookingWizard` component.
-    *   When the user clicks "Kostenpflichtig buchen":
-        *   Send the collected booking data (items, price, etc.) to the `app/api/checkout` API route.
-        *   Upon receiving the Stripe Checkout Session URL, redirect the user's browser to this URL.
-
-5.  **Payment Confirmation and Redirect:**
-    *   After successful payment on Stripe's secure page, Stripe will redirect the user back to a pre-defined URL on your website (e.g., `/booking/success`).
-    *   Create a simple `/booking/success/page.tsx` to display a thank-you message.
-
-6.  **Payment Verification (Stripe Webhooks):**
-    *   This is a crucial security step. Create another API route, e.g., `app/api/stripe-webhook/route.ts`.
-    *   Configure a webhook in your Stripe Dashboard to send notifications to this API route when payment-related events occur (e.g., `checkout.session.completed`).
-    *   This webhook handler will:
-        *   Verify the webhook's authenticity.
-        *   Process the `checkout.session.completed` event.
-        *   Update your internal records (e.g., mark booking as paid).
-        *   **Send the final booking confirmation email to the customer.** This ensures emails are only sent for confirmed payments.
+1.  **Stripe Setup:** Enable PayPal, SEPA, Giropay, and Sofort in the Stripe Dashboard.
+2.  **Install SDK:** `npm install stripe @stripe/stripe-js`
+3.  **Backend (API Route):**
+    *   Create `app/api/checkout/route.ts`.
+    *   Accept booking data (Items, Price).
+    *   Create a **Stripe Checkout Session** and return the URL.
+4.  **Frontend (BookingWizard):**
+    *   Call `/api/checkout` on submit.
+    *   Redirect user to the Stripe URL.
+5.  **Verification (Webhooks):**
+    *   Create `app/api/stripe-webhook/route.ts`.
+    *   Listen for `checkout.session.completed`.
+    *   **Action:** Send confirmation email to customer only after verified payment.
 
 ---
 
-## Next Steps for Implementation:
+## Phase 3: Technical Optimization (The "Polish")
 
-I am ready to proceed with implementing the **Stripe Code skeleton**. This would involve:
-1.  Installing the Stripe npm packages.
-2.  Creating the `app/api/checkout/route.ts` API endpoint.
-3.  Modifying the `BookingWizard.tsx` to call this API and handle the redirect.
-4.  Creating a placeholder `app/booking/success/page.tsx`.
-5.  Setting up the basic structure for the `app/api/stripe-webhook/route.ts`.
+**Goal:** Achieve 100/100 Google Lighthouse score and improve SEO visibility.
 
-You will need to add your **Stripe API Keys** (Publishable Key for frontend, Secret Key for backend) to your `.env` file and later to Vercel's environment variables.
+### 1. 🚀 Performance: `next/image` Migration
+**Problem:** Current CSS background images load at full resolution on all devices (slow LCP).
+**Solution:** Refactor `Hero`, `Activities`, and Detail pages to use the `<Image />` component.
+*   **Benefit:** Automatic WebP/AVIF conversion, lazy-loading, and mobile resizing.
+
+### 2. 🖼️ Visual SEO: Dynamic Open Graph (Social Cards)
+**Problem:** Sharing the link on WhatsApp/LinkedIn shows no preview.
+**Solution:** Use `@vercel/og` to generate dynamic preview cards.
+*   **Feature:** Create a generic card for the homepage and specific cards for courses (e.g., displaying the specific course title and price on the image).
+
+### 3. 🧠 Rich SEO: FAQ Schema (JSON-LD)
+**Problem:** Google sees text but not "answers".
+**Solution:** Add a structured FAQ section to Course pages.
+*   **Implementation:** Wrap questions (e.g., "Do I need a wetsuit?") in `application/ld+json` Schema.
+*   **Benefit:** Questions appear directly in Google Search results, increasing click-through rate.

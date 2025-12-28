@@ -3,37 +3,56 @@
 import { motion } from 'framer-motion';
 import { Timer, Star, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import { RentalItem } from '@/lib/db/types';
 
-const rentals = [
-  {
-    category: 'Windsurfen',
-    items: [
-      { name: 'Einsteiger Board (1 Std)', price: '15€' },
-      { name: 'Funboard / Pro (1 Std)', price: '20€' },
-      { name: 'Rigg komplett (1 Std)', price: '15€' },
-      { name: 'Neoprenanzug', price: '5€' },
-    ]
-  },
-  {
-    category: 'Stand Up Paddling',
-    items: [
-      { name: 'SUP Board (1 Std)', price: '15€' },
-      { name: 'SUP Board (2 Std)', price: '25€' },
-      { name: 'Big SUP (für 6-8 Pers)', price: '80€' },
-      { name: 'Trockenbeutel', price: '2€' },
-    ]
-  },
-  {
-    category: 'Longboard',
-    items: [
-      { name: 'Longboard (1 Std)', price: '8€' },
-      { name: 'Longboard (Tag)', price: '25€' },
-      { name: 'Helm & Schoner', price: 'Inkl.' },
-    ]
-  }
-];
+interface VerleihContentProps {
+  rentalItems?: RentalItem[];
+}
 
-export function VerleihContent() {
+export function VerleihContent({ rentalItems = [] }: VerleihContentProps) {
+
+  const formatPrice = (cents: number) => {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+  };
+
+  const findPrice = (name: string, defaultPrice: string) => {
+    // This assumes names in DB match roughly or we use a more complex matching logic.
+    // For simplicity, we'll stick to defaults if no exact match or enhance DB later.
+    // Ideally, DB items should have a 'display_category' or similar.
+    // Since our seed data was limited, we'll check if we find a price, else default.
+    const item = rentalItems.find(i => i.name === name);
+    return item ? formatPrice(item.price_per_hour_cents) : defaultPrice;
+  };
+
+  const rentals = [
+    {
+      category: 'Windsurfen',
+      items: [
+        { name: 'Windsurf Board + Rigg', defaultPrice: '15€' }, // Matches DB seed name approximately
+        { name: 'Funboard / Pro (1 Std)', defaultPrice: '20€' },
+        { name: 'Rigg komplett (1 Std)', defaultPrice: '15€' },
+        { name: 'Neoprenanzug', defaultPrice: '5€' }, // Matches DB
+      ]
+    },
+    {
+      category: 'Stand Up Paddling',
+      items: [
+        { name: 'SUP Board', defaultPrice: '15€' }, // Matches DB seed "SUP Board"
+        { name: 'SUP Board (2 Std)', defaultPrice: '25€' },
+        { name: 'Big SUP (für 6-8 Pers)', defaultPrice: '80€' },
+        { name: 'Trockenbeutel', defaultPrice: '2€' },
+      ]
+    },
+    {
+      category: 'Longboard',
+      items: [
+        { name: 'Longboard', defaultPrice: '8€' }, // Matches DB seed "Longboard"
+        { name: 'Longboard (Tag)', defaultPrice: '25€' },
+        { name: 'Helm & Schoner', defaultPrice: 'Inkl.' },
+      ]
+    }
+  ];
+
   return (
     <>
       <div className="text-center mb-16">
@@ -61,12 +80,20 @@ export function VerleihContent() {
           >
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b dark:border-slate-800 pb-4">{cat.category}</h3>
             <ul className="space-y-4">
-              {cat.items.map((item) => (
-                <li key={item.name} className="flex justify-between items-center text-slate-700 dark:text-slate-300">
-                  <span>{item.name}</span>
-                  <span className="font-bold text-cyan-600 dark:text-cyan-400">{item.price}</span>
-                </li>
-              ))}
+              {cat.items.map((item) => {
+                // Fuzzy match or direct match logic
+                // For "Windsurf Board + Rigg" in DB vs local name
+                // We'll try to find an item that *starts with* or *includes* the name
+                const dbItem = rentalItems.find(ri => item.name.includes(ri.name) || ri.name.includes(item.name));
+                const price = dbItem ? formatPrice(dbItem.price_per_hour_cents) : item.defaultPrice;
+
+                return (
+                  <li key={item.name} className="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                    <span>{item.name}</span>
+                    <span className="font-bold text-cyan-600 dark:text-cyan-400">{price}</span>
+                  </li>
+                );
+              })}
             </ul>
           </motion.div>
         ))}

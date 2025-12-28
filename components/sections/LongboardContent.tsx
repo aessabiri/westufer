@@ -3,20 +3,62 @@
 import { motion } from 'framer-motion';
 import { Check, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { Course } from '@/lib/db/types';
 
-export function LongboardContent() {
+interface LongboardContentProps {
+  courses?: Course[];
+}
+
+export function LongboardContent({ courses = [] }: LongboardContentProps) {
+
+  const formatPrice = (cents: number) => {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+  };
+
+  const displayItems = [
+    { 
+      slug: 'longboard-verleih-2h',
+      title: 'Verleih (2 Std)', 
+      defaultPrice: '12€', 
+      duration: '120 Minuten', 
+      features: ['Longboard nach Wahl', 'Schutzausrüstung', 'Routen-Tipp'], 
+      targetId: 'lb-rent-1h', 
+      type: 'rental' 
+    },
+    { 
+      slug: 'longboard-tagesmiete',
+      title: 'Tagesmiete', 
+      defaultPrice: '25€', 
+      duration: 'Den ganzen Tag', 
+      features: ['Maximale Flexibilität', 'Board-Wechsel möglich', 'Perfekt für die Seerunde'], 
+      popular: true, 
+      targetId: 'lb-rental-day', 
+      type: 'rental' 
+    },
+    { 
+      slug: 'longboard-workshop',
+      title: 'Workshop', 
+      defaultPrice: '35€', 
+      duration: '90 Minuten', 
+      features: ['Bremsen & Fallen', 'Kurventechnik', 'Kleingruppe'], 
+      targetId: 'lb-basic', 
+      type: 'course' 
+    },
+  ];
+
   return (
     <>
       {/* Hero */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1536796038751-bb018f95ca01?w=2000&auto=format&fit=crop')",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        >
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1536796038751-bb018f95ca01?w=2000&auto=format&fit=crop"
+            alt="Longboarden am Kemnader See"
+            fill
+            className="object-cover"
+            priority
+          />
           <div className="absolute inset-0 bg-emerald-900/60" />
         </div>
         <div className="relative z-10 container mx-auto px-6 text-center text-white">
@@ -57,12 +99,14 @@ export function LongboardContent() {
               </ul>
             </div>
             <div className="bg-slate-100 rounded-3xl h-[500px] overflow-hidden relative">
-                 <div 
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: "url('https://images.unsplash.com/photo-1555597408-26bc8e548a46?q=80&w=2073&auto=format&fit=crop')"
-                  }}
-                 />
+                 <div className="w-full h-full relative">
+                   <Image
+                      src="https://images.unsplash.com/photo-1555597408-26bc8e548a46?q=80&w=2073&auto=format&fit=crop"
+                      alt="Longboard Detail"
+                      fill
+                      className="object-cover"
+                   />
+                 </div>
             </div>
           </div>
 
@@ -70,35 +114,37 @@ export function LongboardContent() {
           <div className="mb-20">
             <h2 className="text-3xl font-bold text-center mb-12">Preise</h2>
             <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { title: 'Verleih (2 Std)', price: '12€', duration: '120 Minuten', features: ['Longboard nach Wahl', 'Schutzausrüstung', 'Routen-Tipp'], targetId: 'lb-rent-1h', type: 'rental' },
-                { title: 'Tagesmiete', price: '25€', duration: 'Den ganzen Tag', features: ['Maximale Flexibilität', 'Board-Wechsel möglich', 'Perfekt für die Seerunde'], popular: true, targetId: 'lb-rental-day', type: 'rental' },
-                { title: 'Workshop', price: '35€', duration: '90 Minuten', features: ['Bremsen & Fallen', 'Kurventechnik', 'Kleingruppe'], targetId: 'lb-basic', type: 'course' },
-              ].map((item) => (
-                <div key={item.title} className={`bg-white dark:bg-slate-900 p-8 rounded-3xl border ${item.popular ? 'border-emerald-500 shadow-xl scale-105' : 'border-slate-200 dark:border-slate-800'} relative`}>
-                  {item.popular && (
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                      Best Deal
-                    </span>
-                  )}
-                  <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{item.title}</h3>
-                  <div className="text-4xl font-bold text-emerald-600 mb-2">{item.price}</div>
-                  <p className="text-slate-500 dark:text-slate-400 mb-6">{item.duration}</p>
-                  <ul className="space-y-3 mb-8">
-                    {item.features.map((f) => (
-                      <li key={f} className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link 
-                    href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${item.targetId}`} 
-                    className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
-                  >
-                    Jetzt Buchen
-                  </Link>
-                </div>
-              ))}
+              {displayItems.map((item) => {
+                 // Try to find price in DB
+                 const dbCourse = courses.find(c => c.slug === item.slug);
+                 const price = dbCourse ? formatPrice(dbCourse.price_cents) : item.defaultPrice;
+
+                return (
+                  <div key={item.title} className={`bg-white dark:bg-slate-900 p-8 rounded-3xl border ${item.popular ? 'border-emerald-500 shadow-xl scale-105' : 'border-slate-200 dark:border-slate-800'} relative`}>
+                    {item.popular && (
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                        Best Deal
+                      </span>
+                    )}
+                    <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{item.title}</h3>
+                    <div className="text-4xl font-bold text-emerald-600 mb-2">{price}</div>
+                    <p className="text-slate-500 dark:text-slate-400 mb-6">{item.duration}</p>
+                    <ul className="space-y-3 mb-8">
+                      {item.features.map((f) => (
+                        <li key={f} className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link 
+                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${item.targetId}`} 
+                      className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
+                    >
+                      Jetzt Buchen
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

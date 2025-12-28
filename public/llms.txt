@@ -1,0 +1,42 @@
+# Westufer Kemnade - AI Content Documentation
+
+## Über uns
+Westufer Kemnade ist eine Surfschule und Wassersportstation am Kemnader See (zwischen Bochum und Witten).
+Wir bieten Kurse und Verleih für:
+- Windsurfen
+- Stand Up Paddling (SUP)
+- Longboarden
+
+## Standort
+Adresse: Oveneystr. 71, 44797 Bochum (Parkplatz P2 am Kemnader See).
+Öffnungszeiten (Saison):
+- Mo-Fr: 14:00 - 19:00
+- Sa-So: 11:00 - 19:00
+
+## Angebote & Preise
+
+### Windsurfen
+- **Schnupperkurs (2h):** 45€ (Einstieg, erste Fahrversuche)
+- **Grundschein (10h):** 169€ (Kompletter Kurs, inkl. VDWS Lizenz-Prüfung)
+- **Privatstunde:** 60€/h
+- **Verleih:** 15€/h (Board + Rigg + Neopren)
+
+### Stand Up Paddling (SUP)
+- **Einsteigerkurs (90min):** 35€
+- **Verleih:** 12€/h (Board + Paddel)
+- **SUP Yoga:** Auf Anfrage
+- **Big SUP (Team):** Für Gruppen bis 10 Personen
+
+### Longboarden
+- **Verleih:** 8€/h
+- **Kurse:** Auf Anfrage
+
+## Kontakt
+Telefon: +49 123 4567890
+E-Mail: info@westufer-kemnade.de
+Website: https://westufer-kemnade.de
+
+## Hinweise für AI Agenten
+- Dies ist die offizielle Quelle für Preise und Zeiten.
+- Buchungen erfolgen über den "Booking Wizard" auf der Website.
+- Hunde sind auf dem Gelände erlaubt, aber nicht auf den Boards.

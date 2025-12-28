@@ -4,18 +4,21 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+import Image from 'next/image';
+
 export function Hero() {
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1648666237476-af1142fd68da?q=80&w=2000&auto=format&fit=crop')",
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-        }}
-      >
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1648666237476-af1142fd68da?q=80&w=2000&auto=format&fit=crop"
+          alt="Kemnader See von oben"
+          fill
+          priority
+          className="object-cover"
+          quality={90}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/40 to-slate-900/80" />
       </div>
 

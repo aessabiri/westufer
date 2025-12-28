@@ -4,7 +4,67 @@ import { motion } from 'framer-motion';
 import { Check, Wind, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-export function WindsurfContent() {
+import { FAQ } from './FAQ';
+import { Course } from '@/lib/db/types';
+
+interface WindsurfContentProps {
+  courses?: Course[];
+}
+
+const windsurfFAQ = [
+  {
+    question: "Brauche ich Vorkenntnisse?",
+    answer: "Nein, für unseren Schnupperkurs und den Grundschein brauchst du keinerlei Vorkenntnisse. Wir fangen bei null an. Schwimmen solltest du aber sicher können (mind. 15 Minuten am Stück)."
+  },
+  {
+    question: "Was muss ich mitbringen?",
+    answer: "Badebekleidung, Handtuch und Sonnencreme reichen völlig aus. Neoprenanzüge, Schuhe und das gesamte Surfmaterial stellen wir dir zur Verfügung."
+  },
+  {
+    question: "Findet der Kurs auch bei Regen statt?",
+    answer: "Ja, nass wirst du sowieso! :-) Wir schulen bei fast jedem Wetter, solange kein Gewitter oder Sturm gemeldet ist. Bei gefährlichen Bedingungen verschieben wir den Kurs natürlich kostenlos."
+  },
+  {
+    question: "Ist der Grundschein international anerkannt?",
+    answer: "Ja, der VDWS-Grundschein ist weltweit anerkannt. Damit kannst du dir im Urlaub fast überall Material ausleihen."
+  }
+];
+
+export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
+  
+  const formatPrice = (cents: number) => {
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+  };
+
+  // Map the static display data to the dynamic data from DB
+  const displayCourses = [
+    { 
+      slug: 'windsurf-schnupperkurs',
+      title: 'Schnupperkurs', 
+      defaultPrice: '80€', 
+      duration: '4 Stunden', 
+      features: ['Theorie & Praxis', 'Material inklusive', 'Keine Vorkenntnisse'], 
+      id: 'ws-trial' 
+    },
+    { 
+      slug: 'windsurf-grundschein',
+      title: 'Grundschein', 
+      defaultPrice: '195€', 
+      duration: '12 Stunden', 
+      features: ['VDWS-Lizenz Abschluss', 'Intensivtraining', 'Aufgeteilt auf 2 Tage'], 
+      popular: true, 
+      id: 'ws-basic' 
+    },
+    { 
+      slug: 'private-coaching', // Hypothetical slug
+      title: 'Privatstunde', 
+      defaultPrice: 'Anfrage', 
+      duration: '60 Minuten', 
+      features: ['1-zu-1 Betreuung', 'Individueller Fokus', 'Flexibler Termin'], 
+      id: 'ws-private' 
+    },
+  ];
+
   return (
     <>
       {/* Hero */}
@@ -71,36 +131,41 @@ export function WindsurfContent() {
           <div className="mb-20">
             <h2 className="text-3xl font-bold text-center mb-12">Unsere Kurse</h2>
             <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { title: 'Schnupperkurs', price: '80€', duration: '4 Stunden', features: ['Theorie & Praxis', 'Material inklusive', 'Keine Vorkenntnisse'], id: 'ws-trial' },
-                { title: 'Grundschein', price: '195€', duration: '12 Stunden', features: ['VDWS-Lizenz Abschluss', 'Intensivtraining', 'Aufgeteilt auf 2 Tage'], popular: true, id: 'ws-basic' },
-                { title: 'Privatstunde', price: 'Anfrage', duration: '60 Minuten', features: ['1-zu-1 Betreuung', 'Individueller Fokus', 'Flexibler Termin'], id: 'ws-private' },
-              ].map((course) => (
-                <div key={course.title} className={`bg-white dark:bg-slate-900 p-8 rounded-3xl border ${course.popular ? 'border-blue-500 shadow-xl scale-105' : 'border-slate-200 dark:border-slate-800'} relative`}>
-                  {course.popular && (
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                      Beliebt
-                    </span>
-                  )}
-                  <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{course.title}</h3>
-                  <div className="text-4xl font-bold text-blue-600 mb-2">{course.price}</div>
-                  <p className="text-slate-500 dark:text-slate-400 mb-6">{course.duration}</p>
-                  <ul className="space-y-3 mb-8">
-                    {course.features.map((f) => (
-                      <li key={f} className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={`/booking/kurse?course=${course.id}`} className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}>
-                    Jetzt Buchen
-                  </Link>
-                </div>
-              ))}
+              {displayCourses.map((course) => {
+                // Find matching course in DB
+                const dbCourse = courses.find(c => c.slug === course.slug);
+                const price = dbCourse ? formatPrice(dbCourse.price_cents) : course.defaultPrice;
+
+                return (
+                  <div key={course.title} className={`bg-white dark:bg-slate-900 p-8 rounded-3xl border ${course.popular ? 'border-blue-500 shadow-xl scale-105' : 'border-slate-200 dark:border-slate-800'} relative`}>
+                    {course.popular && (
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                        Beliebt
+                      </span>
+                    )}
+                    <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{course.title}</h3>
+                    <div className="text-4xl font-bold text-blue-600 mb-2">{price}</div>
+                    <p className="text-slate-500 dark:text-slate-400 mb-6">{course.duration}</p>
+                    <ul className="space-y-3 mb-8">
+                      {course.features.map((f) => (
+                        <li key={f} className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href={`/booking/kurse?course=${course.id}`} className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}>
+                      Jetzt Buchen
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQ items={windsurfFAQ} />
     </>
   );
 }

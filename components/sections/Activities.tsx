@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Wind, Waves, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const activities = [
   {
@@ -36,7 +37,7 @@ const activities = [
 
 export function Activities() {
   return (
-    <section id="kurse" className="py-24 bg-slate-50 dark:bg-slate-950 dark:bg-slate-950 transition-colors">
+    <section id="kurse" className="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">Wähle dein Abenteuer</h2>
@@ -58,14 +59,15 @@ export function Activities() {
               {/* Image Header */}
               <div className="h-56 overflow-hidden relative">
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors z-10" />
-                <div 
-                  className="w-full h-full bg-slate-200 dark:bg-slate-800 transition-transform duration-700 group-hover:scale-110"
-                  style={{
-                    backgroundImage: `url(${activity.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
+                <div className="w-full h-full relative transition-transform duration-700 group-hover:scale-110">
+                   <Image
+                      src={activity.image}
+                      alt={activity.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                   />
+                </div>
               </div>
 
               <div className="p-8">

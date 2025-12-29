@@ -3,9 +3,19 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon } from 'lucide-react';
+import { Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon, Loader2, Wind, Waves, MapPin, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { getAvailableSlots } from '@/lib/db/queries';
+
+// Define a type for the formatted slots we'll display
+interface FormattedSlot {
+  id: string; // The slot ID from DB
+  label: string; // "Sa 20.07. - 14:00"
+  short: string; // "Sa 20.07"
+  time: string; // "14:00"
+  available: boolean;
+}
 
 export interface BookingItem {
   id: string;
@@ -13,7 +23,7 @@ export interface BookingItem {
   name: string;
   price: string | number;
   duration?: string;
-  icon: LucideIcon;
+  iconName: string; // Changed from icon: LucideIcon
   color: string;
   bg: string;
   border: string;
@@ -24,28 +34,33 @@ interface BookingWizardProps {
   type: 'course' | 'rental';
 }
 
-const availableDates = [
-  { id: 'd1', label: 'Mo 15.07. - 14:00', short: 'Mo 15.07' },
-  { id: 'd2', label: 'Di 16.07. - 14:00', short: 'Di 16.07' },
-  { id: 'd3', label: 'Mi 17.07. - 14:00', short: 'Mi 17.07' },
-  { id: 'd4', label: 'Sa 20.07. - 11:00', short: 'Sa 20.07' },
-  { id: 'd5', label: 'So 21.07. - 11:00', short: 'So 21.07' },
-];
+const iconMap: Record<string, LucideIcon> = {
+  'wind': Wind,
+  'waves': Waves,
+  'map-pin': MapPin,
+  'help-circle': HelpCircle, // Make sure HelpCircle is imported
+  'user': User, // Add others if needed
+};
 
 function BookingContent({ items, type }: BookingWizardProps) {
+  // ... existing hooks ...
   const searchParams = useSearchParams();
   const initialItemId = searchParams.get(type === 'course' ? 'course' : 'item');
 
   const [step, setStep] = useState(1);
-  // Store selected IDs in an array. 
-  // For courses, we will force single selection. For rentals, allow multiple.
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>(initialItemId ? [initialItemId] : []);
   const [selectedDateId, setSelectedDateId] = useState('');
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
   const [isSuccess, setIsSuccess] = useState(false);
+  
+  // State for real slots
+  const [availableSlots, setAvailableSlots] = useState<FormattedSlot[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
   const selectedItems = items.filter(i => selectedItemIds.includes(i.id));
-  const selectedDate = availableDates.find(d => d.id === selectedDateId);
+  const selectedDate = availableSlots.find(d => d.id === selectedDateId);
+
+  // ... existing useEffects ...
 
   // Auto-select initial item if valid
   useEffect(() => {
@@ -54,12 +69,54 @@ function BookingContent({ items, type }: BookingWizardProps) {
     }
   }, [initialItemId, items]);
 
+  // Fetch slots when a course is selected
+  useEffect(() => {
+    async function fetchSlots() {
+      if (type === 'course' && selectedItemIds.length === 1) {
+        setIsLoadingSlots(true);
+        setAvailableSlots([]); // Reset while loading
+        setSelectedDateId(''); // Reset selection
+        
+        try {
+          const courseId = parseInt(selectedItemIds[0], 10);
+          if (!isNaN(courseId)) {
+            const slots = await getAvailableSlots(courseId);
+            
+            const formatted = slots.map(slot => {
+              const date = new Date(slot.start_time);
+              const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+              const dayName = days[date.getDay()];
+              const day = date.getDate().toString().padStart(2, '0');
+              const month = (date.getMonth() + 1).toString().padStart(2, '0');
+              const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+              
+              const isFull = slot.booked_count >= slot.max_capacity;
+
+              return {
+                id: slot.id.toString(),
+                label: `${dayName} ${day}.${month}. - ${time}`,
+                short: `${dayName} ${day}.${month}.`,
+                time: time,
+                available: !isFull
+              };
+            });
+            setAvailableSlots(formatted);
+          }
+        } catch (err) {
+          console.error("Failed to fetch slots", err);
+        } finally {
+          setIsLoadingSlots(false);
+        }
+      }
+    }
+    
+    fetchSlots();
+  }, [selectedItemIds, type]);
+
   const toggleItem = (id: string) => {
     if (type === 'course') {
-      // Single selection for courses
       setSelectedItemIds([id]);
     } else {
-      // Multi selection for rentals
       setSelectedItemIds(prev => 
         prev.includes(id) 
           ? prev.filter(i => i !== id) 
@@ -81,10 +138,12 @@ function BookingContent({ items, type }: BookingWizardProps) {
     if (typeof item.price === 'number') {
       return sum + item.price;
     }
-    return sum; // Ignore 'Auf Anfrage' for numeric total
+    return sum; 
   }, 0);
 
   const hasStringPrice = selectedItems.some(item => typeof item.price === 'string');
+
+  // ... existing return (isSuccess) ...
 
   if (isSuccess) {
     return (
@@ -158,6 +217,7 @@ function BookingContent({ items, type }: BookingWizardProps) {
                 <div className="grid sm:grid-cols-2 gap-4">
                   {items.map((item) => {
                     const isSelected = selectedItemIds.includes(item.id);
+                    const IconComponent = iconMap[item.iconName] || HelpCircle;
                     return (
                       <button
                         key={item.id}
@@ -171,7 +231,7 @@ function BookingContent({ items, type }: BookingWizardProps) {
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div className={cn("p-2 rounded-lg bg-white dark:bg-slate-950", item.color)}>
-                            <item.icon size={24} />
+                            <IconComponent size={24} />
                           </div>
                           {isSelected && (
                             <div className="bg-cyan-500 text-white rounded-full p-1">
@@ -200,7 +260,6 @@ function BookingContent({ items, type }: BookingWizardProps) {
               </motion.div>
             )}
 
-            {/* Step 2 & 3 remain mostly the same structure, just verifying step validity */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -209,23 +268,45 @@ function BookingContent({ items, type }: BookingWizardProps) {
                 exit={{ opacity: 0, x: -20 }}
               >
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Wähle einen Termin</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-                  {availableDates.map((date) => (
-                    <button 
-                      key={date.id}
-                      onClick={() => setSelectedDateId(date.id)}
-                      className={cn(
-                        "p-4 rounded-xl border text-center transition-all",
-                        selectedDateId === date.id 
-                          ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 font-bold"
-                          : "border-slate-200 dark:border-slate-800 hover:border-cyan-400 text-slate-600 dark:text-slate-300"
-                      )}
-                    >
-                      {date.short}
-                      <span className="block text-xs font-normal mt-1 opacity-70">Verfügbar</span>
-                    </button>
-                  ))}
-                </div>
+                
+                {isLoadingSlots ? (
+                  <div className="flex justify-center items-center py-20">
+                    <Loader2 className="animate-spin text-cyan-500" size={32} />
+                    <span className="ml-3 text-slate-500">Suche freie Plätze...</span>
+                  </div>
+                ) : availableSlots.length === 0 ? (
+                  <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                    <p className="text-slate-500 dark:text-slate-400">Für diesen Kurs sind aktuell leider keine Termine online.</p>
+                    <p className="text-sm text-slate-400 mt-2">Bitte kontaktiere uns telefonisch.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
+                    {availableSlots.map((date) => (
+                      <button 
+                        key={date.id}
+                        disabled={!date.available}
+                        onClick={() => setSelectedDateId(date.id)}
+                        className={cn(
+                          "p-4 rounded-xl border text-center transition-all",
+                          selectedDateId === date.id 
+                            ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 font-bold"
+                            : "border-slate-200 dark:border-slate-800 hover:border-cyan-400 text-slate-600 dark:text-slate-300",
+                          !date.available && "opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800"
+                        )}
+                      >
+                        <span className="block mb-1">{date.short}</span>
+                        <span className="text-lg">{date.time}</span>
+                        <span className={cn(
+                          "block text-xs font-normal mt-2",
+                          date.available ? "text-green-500" : "text-red-500"
+                        )}>
+                          {date.available ? "Verfügbar" : "Ausgebucht"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex justify-between mt-8">
                   <button onClick={handleBack} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium">Zurück</button>
                   <button 
@@ -248,7 +329,6 @@ function BookingContent({ items, type }: BookingWizardProps) {
               >
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Deine Details</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Form fields same as before... */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Vorname</label>

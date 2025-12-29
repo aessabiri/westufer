@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export default async function WindsurfPage() {
   const courses = await getCourses();
   // Filter for windsurf courses only
-  const windsurfCourses = courses.filter(c => c.slug.includes('windsurf'));
+  const windsurfCourses = courses.filter(c => c.slug.startsWith('ws-'));
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">

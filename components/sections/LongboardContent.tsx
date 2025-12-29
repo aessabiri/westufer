@@ -18,26 +18,26 @@ export function LongboardContent({ courses = [] }: LongboardContentProps) {
 
   const displayItems = [
     { 
-      slug: 'longboard-verleih-2h',
+      slug: 'lb-rent-1h',
       title: 'Verleih (2 Std)', 
       defaultPrice: '12€', 
       duration: '120 Minuten', 
       features: ['Longboard nach Wahl', 'Schutzausrüstung', 'Routen-Tipp'], 
-      targetId: 'lb-rent-1h', 
+      targetId: '7', 
       type: 'rental' 
     },
     { 
-      slug: 'longboard-tagesmiete',
+      slug: 'lb-rent-day',
       title: 'Tagesmiete', 
       defaultPrice: '25€', 
       duration: 'Den ganzen Tag', 
       features: ['Maximale Flexibilität', 'Board-Wechsel möglich', 'Perfekt für die Seerunde'], 
       popular: true, 
-      targetId: 'lb-rental-day', 
+      targetId: '8', 
       type: 'rental' 
     },
     { 
-      slug: 'longboard-workshop',
+      slug: 'lb-basic',
       title: 'Workshop', 
       defaultPrice: '35€', 
       duration: '90 Minuten', 
@@ -137,7 +137,7 @@ export function LongboardContent({ courses = [] }: LongboardContentProps) {
                       ))}
                     </ul>
                     <Link 
-                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${item.targetId}`} 
+                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${dbCourse ? dbCourse.id : item.targetId}`} 
                       className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
                     >
                       Jetzt Buchen

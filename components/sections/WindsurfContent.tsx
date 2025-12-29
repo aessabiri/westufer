@@ -39,7 +39,7 @@ export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
   // Map the static display data to the dynamic data from DB
   const displayCourses = [
     { 
-      slug: 'windsurf-schnupperkurs',
+      slug: 'ws-trial',
       title: 'Schnupperkurs', 
       defaultPrice: '80€', 
       duration: '4 Stunden', 
@@ -47,7 +47,7 @@ export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
       id: 'ws-trial' 
     },
     { 
-      slug: 'windsurf-grundschein',
+      slug: 'ws-basic',
       title: 'Grundschein', 
       defaultPrice: '195€', 
       duration: '12 Stunden', 
@@ -56,7 +56,7 @@ export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
       id: 'ws-basic' 
     },
     { 
-      slug: 'private-coaching', // Hypothetical slug
+      slug: 'ws-private',
       title: 'Privatstunde', 
       defaultPrice: 'Anfrage', 
       duration: '60 Minuten', 
@@ -153,7 +153,10 @@ export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
                         </li>
                       ))}
                     </ul>
-                    <Link href={`/booking/kurse?course=${course.id}`} className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}>
+                    <Link 
+                      href={`/booking/kurse?course=${dbCourse ? dbCourse.id : course.id}`} 
+                      className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
+                    >
                       Jetzt Buchen
                     </Link>
                   </div>

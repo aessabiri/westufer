@@ -18,16 +18,16 @@ export function SupContent({ courses = [] }: SupContentProps) {
 
   const displayItems = [
     { 
-      slug: 'sup-verleih-1h',
+      slug: 'sup-rent-1h',
       title: 'Verleih (1 Std)', 
       defaultPrice: '15€', 
       duration: '60 Minuten', 
       features: ['Board & Paddel', 'Schwimmweste', 'Kurze Einweisung'], 
-      targetId: 'sup-rent-1h', 
+      targetId: '4', 
       type: 'rental' 
     },
     { 
-      slug: 'sup-einsteiger',
+      slug: 'sup-basic',
       title: 'Einsteigerkurs', 
       defaultPrice: '39€', 
       duration: '90 Minuten', 
@@ -37,7 +37,7 @@ export function SupContent({ courses = [] }: SupContentProps) {
       type: 'course' 
     },
     { 
-      slug: 'sup-sunset-tour',
+      slug: 'sup-tour',
       title: 'Sunset Tour', 
       defaultPrice: '29€', 
       duration: 'ca. 2 Stunden', 
@@ -137,7 +137,7 @@ export function SupContent({ courses = [] }: SupContentProps) {
                       ))}
                     </ul>
                     <Link 
-                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${item.targetId}`} 
+                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${dbCourse ? dbCourse.id : item.targetId}`} 
                       className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-cyan-500 hover:bg-cyan-600 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
                     >
                       Jetzt Buchen

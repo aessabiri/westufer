@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export default async function SupPage() {
   const courses = await getCourses();
   // Filter for SUP courses
-  const supCourses = courses.filter(c => c.slug.includes('sup'));
+  const supCourses = courses.filter(c => c.slug.startsWith('sup-'));
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">

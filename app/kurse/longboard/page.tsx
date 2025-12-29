@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export default async function LongboardPage() {
   const courses = await getCourses();
   // Filter for Longboard courses/items
-  const lbCourses = courses.filter(c => c.slug.includes('longboard'));
+  const lbCourses = courses.filter(c => c.slug.startsWith('lb-'));
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">

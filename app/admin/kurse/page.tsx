@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { generateSlots, deleteSlot } from './actions';
 import Link from 'next/link';
-import { ChevronLeft, Plus, Trash2, Calendar, Check, Clock } from 'lucide-react';
+import { ChevronLeft, Plus, Trash2, Calendar, Check, Clock, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
@@ -23,21 +23,24 @@ export default function KurseAdminPage() {
   const [mode, setMode] = useState<'single' | 'range'>('range');
   const [selectedDays, setSelectedDays] = useState<number[]>([6, 0]); // Default Sat/Sun
   const [isLoading, setIsLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const refreshData = async () => {
+    const { data: coursesData } = await supabase.from('courses').select('*').order('title');
+    const { data: slotsData } = await supabase
+      .from('course_slots')
+      .select('*, courses(title)')
+      .gt('start_time', new Date().toISOString())
+      .order('start_time', { ascending: true });
+    
+    setCourses(coursesData || []);
+    setSlots(slotsData || []);
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: coursesData } = await supabase.from('courses').select('*').order('title');
-      const { data: slotsData } = await supabase
-        .from('course_slots')
-        .select('*, courses(title)')
-        .gt('start_time', new Date().toISOString())
-        .order('start_time', { ascending: true });
-      
-      setCourses(coursesData || []);
-      setSlots(slotsData || []);
-      setIsLoading(false);
-    }
-    fetchData();
+    refreshData().then(() => setIsLoading(false));
   }, []);
 
   const toggleDay = (day: number) => {
@@ -45,6 +48,37 @@ export default function KurseAdminPage() {
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
   };
+
+  async function handleGenerate(formData: FormData) {
+    setIsGenerating(true);
+    setStatus('idle');
+    setErrorMessage('');
+
+    try {
+      const result = await generateSlots(formData);
+      if (result.success) {
+        setStatus('success');
+        await refreshData();
+        setTimeout(() => setStatus('idle'), 3000);
+      } else {
+        setStatus('error');
+        setErrorMessage(result.error || 'Fehler beim Generieren');
+      }
+    } catch (err) {
+      setStatus('error');
+      setErrorMessage('Verbindungsfehler');
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  async function handleDelete(id: number) {
+    if (!confirm('Termin wirklich löschen?')) return;
+    const result = await deleteSlot(id);
+    if (result.success) {
+      await refreshData();
+    }
+  }
 
   if (isLoading) return <div className="p-20 text-center">Laden...</div>;
 
@@ -62,18 +96,16 @@ export default function KurseAdminPage() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <div className="glass-panel p-6 rounded-3xl sticky top-8 border-2 border-cyan-500/20 shadow-cyan-500/5">
+          <div className={cn(
+            "glass-panel p-6 rounded-3xl sticky top-8 border-2 transition-all duration-500",
+            status === 'success' ? "border-green-500/50" : 
+            status === 'error' ? "border-red-500/50" : "border-cyan-500/20"
+          )}>
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Plus size={20} className="text-cyan-500" /> Slot-Generator
             </h2>
             
-            <form 
-              action={async (formData) => {
-                await generateSlots(formData);
-                window.location.reload();
-              }} 
-              className="space-y-6"
-            >
+            <form action={handleGenerate} className="space-y-6">
               <input type="hidden" name="mode" value={mode} />
               {selectedDays.map(d => <input key={d} type="hidden" name="days" value={d} />)}
 
@@ -131,17 +163,17 @@ export default function KurseAdminPage() {
                 {mode === 'single' ? (
                   <div>
                     <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Datum</label>
-                    <input type="date" name="singleDate" className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900" />
+                    <input type="date" name="singleDate" required className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900" />
                   </div>
                 ) : (
                   <>
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Von</label>
-                      <input type="date" name="startDate" className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900 text-sm" />
+                      <input type="date" name="startDate" required className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900 text-sm" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Bis</label>
-                      <input type="date" name="endDate" className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900 text-sm" />
+                      <input type="date" name="endDate" required className="w-full p-3 rounded-xl border dark:border-white/10 bg-white dark:bg-slate-900 text-sm" />
                     </div>
                   </>
                 )}
@@ -161,9 +193,24 @@ export default function KurseAdminPage() {
                 </div>
               </div>
 
-              <button className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]">
-                Termine generieren
+              <button 
+                disabled={isGenerating}
+                className={cn(
+                  "w-full py-4 font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl flex items-center justify-center gap-2",
+                  status === 'success' ? "bg-green-500 text-white" :
+                  status === 'error' ? "bg-red-500 text-white" :
+                  "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
+                )}
+              >
+                {isGenerating ? <Loader2 size={18} className="animate-spin" /> :
+                 status === 'success' ? <><CheckCircle2 size={18} /> Erfolgreich!</> :
+                 status === 'error' ? <><AlertCircle size={18} /> Fehlgeschlagen</> :
+                 "Termine generieren"}
               </button>
+              
+              {status === 'error' && (
+                <p className="text-[10px] text-red-500 font-bold text-center uppercase tracking-tighter mt-2">{errorMessage}</p>
+              )}
             </form>
           </div>
         </div>
@@ -198,11 +245,12 @@ export default function KurseAdminPage() {
                         {slot.booked_count} / {slot.max_capacity} Plätze
                       </span>
                     </div>
-                    <form action={async () => { await deleteSlot(slot.id); window.location.reload(); }}>
-                      <button className="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                        <Trash2 size={18} />
-                      </button>
-                    </form>
+                    <button 
+                      onClick={() => handleDelete(slot.id)}
+                      className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 </div>
               ))}

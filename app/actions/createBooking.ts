@@ -60,18 +60,33 @@ export async function createBooking(data: BookingRequest) {
 
     // --- CASE B: RENTAL BOOKING ---
     if (data.rentalItems && data.rentalItems.length > 0 && data.rentalDate) {
+      // 1. Validate Date (Must be today or in the future)
+      const selectedDate = new Date(data.rentalDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        return { success: false, error: 'Der gewählte Termin liegt in der Vergangenheit.' };
+      }
+
       // Process each item in the "cart"
       for (const itemRequest of data.rentalItems) {
-        // 1. Get Item Info & Total Inventory
+        // 2. Validate Quantity (DoS Protection)
+        if (itemRequest.quantity < 1 || itemRequest.quantity > 10) {
+          return { success: false, error: 'Ungültige Anzahl (Max. 10 pro Item).' };
+        }
+
+        // 3. Get Item Info & Total Inventory
         const { data: item, error: itemErr } = await supabase
           .from('rental_items')
           .select('total_quantity, price_per_hour_cents')
           .eq('id', itemRequest.id)
           .single();
 
-        if (itemErr || !item) continue;
+        if (itemErr || !item) {
+          return { success: false, error: `Equipment mit ID ${itemRequest.id} nicht gefunden.` };
+        }
 
-        // 2. Check current bookings for this item on this date
+        // 4. Check current bookings for this item on this date
         const { count, error: countErr } = await supabase
           .from('bookings')
           .select('*', { count: 'exact', head: true })
@@ -88,15 +103,15 @@ export async function createBooking(data: BookingRequest) {
           };
         }
 
-        // 3. Insert a row for each quantity (to maintain inventory count via simple rows)
-        // Alternatively, add a 'quantity' column to bookings, but our plan was "multiple rows"
+        // 5. Insert a row for each quantity
         const inserts = Array(itemRequest.quantity).fill({
           rental_item_id: itemRequest.id,
           rental_date: data.rentalDate,
           customer_name: customerName,
           customer_email: data.email,
           customer_phone: data.phone,
-          amount_total_cents: item.price_per_hour_cents, // Assuming hourly for now as per schema
+          status: 'pending',
+          amount_total_cents: item.price_per_hour_cents,
         });
 
         const { error: multiInsertErr } = await supabase.from('bookings').insert(inserts);

@@ -24,7 +24,9 @@ export type BookingStatus = 'pending' | 'paid' | 'cancelled';
 
 export interface Booking {
   id: string; // UUID
-  slot_id: number;
+  slot_id?: number; // Optional now
+  rental_item_id?: number; // New: for rentals
+  rental_date?: string; // New: YYYY-MM-DD
   customer_name: string;
   customer_email: string;
   customer_phone?: string;

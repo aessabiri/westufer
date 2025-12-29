@@ -63,7 +63,7 @@ export async function generateSlots(formData: FormData) {
 
   if (error) {
     console.error('Insert Error:', error)
-    return { success: false, error: 'Fehler beim Erstellen der Termine.' }
+    return { success: false, error: `DB-Fehler: ${error.message}` }
   }
 
   revalidatePath('/admin/kurse')

@@ -6,6 +6,12 @@ import { revalidatePath } from 'next/cache'
 export async function updateEquipment(formData: FormData) {
   const supabase = await createClient()
   
+  // 0. Explicit Auth Check
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { success: false, error: 'Nicht autorisiert.' }
+  }
+  
   const id = parseInt(formData.get('id') as string)
   const quantity = parseInt(formData.get('quantity') as string)
   const price = parseFloat(formData.get('price') as string)

@@ -6,6 +6,12 @@ import { revalidatePath } from 'next/cache'
 export async function toggleCheckIn(bookingId: string, currentStatus: boolean) {
   const supabase = await createClient()
   
+  // 0. Explicit Auth Check
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { success: false, error: 'Nicht autorisiert.' }
+  }
+  
   const { error } = await supabase
     .from('bookings')
     .update({ checked_in: !currentStatus })

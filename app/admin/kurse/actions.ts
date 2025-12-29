@@ -6,6 +6,12 @@ import { revalidatePath } from 'next/cache'
 export async function generateSlots(formData: FormData) {
   const supabase = await createClient()
   
+  // 0. Explicit Auth Check
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { success: false, error: 'Nicht autorisiert.' }
+  }
+  
   const courseId = parseInt(formData.get('courseId') as string)
   const startTime = formData.get('startTime') as string // HH:mm
   const mode = formData.get('mode') as 'single' | 'range'

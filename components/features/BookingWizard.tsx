@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon, Loader2, Wind, Waves, MapPin, HelpCircle } from 'lucide-react';
+import { Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon, Loader2, Wind, Waves, MapPin, HelpCircle, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { getAvailableSlots } from '@/lib/db/queries';
+import { createBooking } from '@/app/actions/createBooking';
 
 // Define a type for the formatted slots we'll display
 interface FormattedSlot {
@@ -23,7 +24,7 @@ export interface BookingItem {
   name: string;
   price: string | number;
   duration?: string;
-  iconName: string; // Changed from icon: LucideIcon
+  iconName: string;
   color: string;
   bg: string;
   border: string;
@@ -38,12 +39,12 @@ const iconMap: Record<string, LucideIcon> = {
   'wind': Wind,
   'waves': Waves,
   'map-pin': MapPin,
-  'help-circle': HelpCircle, // Make sure HelpCircle is imported
-  'user': User, // Add others if needed
+  'help-circle': HelpCircle,
+  'user': User,
+  'shopping-bag': ShoppingBag,
 };
 
 function BookingContent({ items, type }: BookingWizardProps) {
-  // ... existing hooks ...
   const searchParams = useSearchParams();
   const initialItemId = searchParams.get(type === 'course' ? 'course' : 'item');
 
@@ -52,30 +53,27 @@ function BookingContent({ items, type }: BookingWizardProps) {
   const [selectedDateId, setSelectedDateId] = useState('');
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  // State for real slots
   const [availableSlots, setAvailableSlots] = useState<FormattedSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
   const selectedItems = items.filter(i => selectedItemIds.includes(i.id));
   const selectedDate = availableSlots.find(d => d.id === selectedDateId);
 
-  // ... existing useEffects ...
-
-  // Auto-select initial item if valid
   useEffect(() => {
     if (initialItemId && items.find(i => i.id === initialItemId)) {
       setSelectedItemIds([initialItemId]);
     }
   }, [initialItemId, items]);
 
-  // Fetch slots when a course is selected
   useEffect(() => {
     async function fetchSlots() {
       if (type === 'course' && selectedItemIds.length === 1) {
         setIsLoadingSlots(true);
-        setAvailableSlots([]); // Reset while loading
-        setSelectedDateId(''); // Reset selection
+        setAvailableSlots([]);
+        setSelectedDateId('');
         
         try {
           const courseId = parseInt(selectedItemIds[0], 10);
@@ -125,15 +123,43 @@ function BookingContent({ items, type }: BookingWizardProps) {
     }
   };
 
-  const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
-  const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSuccess(true);
+  const handleNext = () => {
+    setErrorMessage(null);
+    setStep(prev => Math.min(prev + 1, 3));
+  };
+  const handleBack = () => {
+    setErrorMessage(null);
+    setStep(prev => Math.max(prev - 1, 1));
   };
 
-  // Calculate total price
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      // 2. Call Server Action (Price is handled on server for security)
+      const result = await createBooking({
+        slotId: parseInt(selectedDateId, 10),
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+      });
+
+      if (result.success) {
+        setIsSuccess(true);
+      } else {
+        setErrorMessage(result.error || 'Es gab ein Problem bei der Buchung.');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage('Ein unerwarteter Fehler ist aufgetreten.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const totalPrice = selectedItems.reduce((sum, item) => {
     if (typeof item.price === 'number') {
       return sum + item.price;
@@ -142,8 +168,6 @@ function BookingContent({ items, type }: BookingWizardProps) {
   }, 0);
 
   const hasStringPrice = selectedItems.some(item => typeof item.price === 'string');
-
-  // ... existing return (isSuccess) ...
 
   if (isSuccess) {
     return (
@@ -158,8 +182,13 @@ function BookingContent({ items, type }: BookingWizardProps) {
           </div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Buchung erfolgreich!</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-8">
-            Vielen Dank, {formData.firstName}! Wir haben dir eine Bestätigung an <strong>{formData.email}</strong> gesendet.
+            Vielen Dank, {formData.firstName}! Wir haben dir eine Reservierungsbestätigung an <strong>{formData.email}</strong> gesendet.
           </p>
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl mb-8 border border-yellow-200 dark:border-yellow-800">
+             <p className="text-sm text-yellow-800 dark:text-yellow-200">
+               <strong>Hinweis:</strong> Bitte bezahle den Kurs vor Ort in bar oder per Karte.
+             </p>
+          </div>
           <Link href="/" className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity">
             Zurück zur Startseite
           </Link>
@@ -171,8 +200,7 @@ function BookingContent({ items, type }: BookingWizardProps) {
   return (
     <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8 items-start">
       <div className="lg:col-span-2 space-y-8">
-        {/* Progress Bar */}
-        <div className="flex items-center justify-between mb-8 px-2">
+        <div className="flex items-center justify-between mb-8 px-2 relative">
           {[type === 'course' ? 'Kurs' : 'Equipment', 'Termin', 'Daten'].map((label, idx) => {
             const stepNum = idx + 1;
             const isActive = step >= stepNum;
@@ -209,11 +237,6 @@ function BookingContent({ items, type }: BookingWizardProps) {
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                   {type === 'course' ? 'Wähle dein Erlebnis' : 'Wähle dein Equipment'}
                 </h2>
-                {type === 'rental' && (
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 -mt-4">
-                    Tipp: Du kannst mehrere Gegenstände auswählen.
-                  </p>
-                )}
                 <div className="grid sm:grid-cols-2 gap-4">
                   {items.map((item) => {
                     const isSelected = selectedItemIds.includes(item.id);
@@ -277,7 +300,6 @@ function BookingContent({ items, type }: BookingWizardProps) {
                 ) : availableSlots.length === 0 ? (
                   <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
                     <p className="text-slate-500 dark:text-slate-400">Für diesen Kurs sind aktuell leider keine Termine online.</p>
-                    <p className="text-sm text-slate-400 mt-2">Bitte kontaktiere uns telefonisch.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
@@ -386,13 +408,29 @@ function BookingContent({ items, type }: BookingWizardProps) {
                     </div>
                   </div>
 
+                  {errorMessage && (
+                    <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm font-medium">
+                      {errorMessage}
+                    </div>
+                  )}
+
                   <div className="flex justify-between mt-8 items-center">
                     <button type="button" onClick={handleBack} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium">Zurück</button>
                     <button 
                       type="submit"
-                      className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all flex items-center gap-2"
+                      disabled={isSubmitting}
+                      className="bg-green-500 hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/30 transition-all flex items-center gap-2"
                     >
-                      Kostenpflichtig buchen <CreditCard size={18} />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="animate-spin" size={18} />
+                          Wird gebucht...
+                        </>
+                      ) : (
+                        <>
+                          Kostenpflichtig buchen <CreditCard size={18} />
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

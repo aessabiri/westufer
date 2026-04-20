@@ -3,9 +3,10 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, PartyPopper, Users, Calendar, User, Mail, Phone, MessageSquare, Check, ChevronRight, Send } from 'lucide-react';
+import { GraduationCap, PartyPopper, Users, Calendar, User, Mail, Phone, MessageSquare, Check, ChevronRight, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { submitInquiry } from '@/app/actions/inquiry';
 
 const eventTypes = [
   { id: 'school', label: 'Schulklasse', icon: GraduationCap, color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' },
@@ -18,6 +19,7 @@ function InquiryFormContent() {
   const initialType = searchParams.get('type');
 
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     type: initialType || '',
     participants: '',
@@ -28,13 +30,28 @@ function InquiryFormContent() {
     message: ''
   });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      const res = await submitInquiry(formData);
+      if (res.success) {
+        setIsSuccess(true);
+      } else {
+        setError('Ein Fehler ist aufgetreten. Bitte versuche es später erneut.');
+      }
+    } catch (err) {
+      setError('Netzwerkfehler. Bitte überprüfe deine Verbindung.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSuccess) {
@@ -267,14 +284,20 @@ function InquiryFormContent() {
                   </div>
 
                   <div className="flex justify-between pt-8 items-center">
-                    <button type="button" onClick={handleBack} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium">Zurück</button>
+                    <button type="button" onClick={handleBack} disabled={isSubmitting} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium disabled:opacity-50">Zurück</button>
                     <button 
                       type="submit"
-                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30 transition-all"
+                      disabled={isSubmitting}
+                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30 transition-all disabled:opacity-70 disabled:cursor-wait"
                     >
-                      Anfrage absenden <Send size={20} />
+                      {isSubmitting ? (
+                        <>Senden... <Loader2 size={20} className="animate-spin" /></>
+                      ) : (
+                        <>Anfrage absenden <Send size={20} /></>
+                      )}
                     </button>
                   </div>
+                  {error && <p className="text-red-500 text-sm text-right mt-2">{error}</p>}
                 </form>
               </motion.div>
             )}

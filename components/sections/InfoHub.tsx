@@ -47,41 +47,35 @@ export function InfoHub() {
                   <div>
                     <h4 className="font-semibold text-slate-900 dark:text-white">Standort</h4>
                     <p className="text-slate-600 dark:text-slate-400">
-                      Westufer Kemnade<br />
-                      Oveneystr. 71<br />
+                      Surfschule WestUfer<br />
+                      Bootshallen Gibraltar<br />
+                      Oveneystraße 71<br />
                       44797 Bochum
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            <button className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 font-semibold hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors group">
-              <Phone className="w-5 h-5 group-hover:shake" />
-              <span>+49 123 4567890 anrufen</span>
-            </button>
           </motion.div>
 
-          {/* Map / Image Placeholder */}
+          {/* Real Google Maps Embed */}
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="h-[400px] bg-slate-200 dark:bg-slate-800 rounded-3xl overflow-hidden relative shadow-lg"
+            className="h-[450px] bg-slate-200 dark:bg-slate-800 rounded-[2.5rem] overflow-hidden relative shadow-2xl border-4 border-white dark:border-slate-800"
           >
-            <div 
-               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
-               style={{
-                 backgroundImage: "url('https://images.unsplash.com/photo-1534234828569-1f27c71f3088?q=80&w=2070&auto=format&fit=crop')"
-               }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-end p-8">
-              <div className="text-white">
-                <p className="font-bold text-lg">Direkt am Wasser</p>
-                <p className="text-white/80">Kostenlose Parkplätze vorhanden</p>
-              </div>
-            </div>
+            <iframe 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              style={{ border: 0 }} 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2487.6534246413247!2d7.257674277161745!3d51.427845316538965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47b9204044996919%3A0xc395f2e825a0d3b!2sSurfschule%20WestUfer!5e0!3m2!1sde!2sde!4v1713612000000!5m2!1sde!2sde" 
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
           </motion.div>
         </div>
       </div>

@@ -7,12 +7,13 @@ import { cn } from '@/lib/utils';
 
 interface BookingkitWidgetProps {
   configId: string;
+  experienceId?: string; // New: Optional ID for specific items
 }
 
-export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
+export default function BookingkitWidget({ configId, experienceId }: BookingkitWidgetProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [isVisible, setIsVisible] = useState(false); // New: Lazy load state
+  const [isVisible, setIsVisible] = useState(false);
   const [height, setHeight] = useState(800);
   const { resolvedTheme } = useTheme();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -20,15 +21,14 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
   useEffect(() => {
     setMounted(true);
     
-    // Lazy loading logic: only load the widget when it's near the viewport
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          observer.disconnect(); // Only load once
+          observer.disconnect();
         }
       },
-      { rootMargin: '200px' } // Start loading when user is 200px away
+      { rootMargin: '200px' }
     );
 
     if (wrapperRef.current) {
@@ -49,6 +49,9 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
   }, []);
 
   const isDark = mounted && resolvedTheme === 'dark';
+
+  // Construct the script URL with experienceId if present
+  const scriptUrl = `https://848330c015276c47b62dc51d28dbae1e.widget.bookingkit.net/bkscript/${configId}/${experienceId ? `?e=${experienceId}` : ''}`;
 
   const isolatedHtml = `
     <!DOCTYPE html>
@@ -74,11 +77,8 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
         </style>
       </head>
       <body>
-        <div id="bookingKitContainer" data-cw="${configId}"></div>
-        <script 
-          src="https://848330c015276c47b62dc51d28dbae1e.widget.bookingkit.net/bkscript/${configId}/" 
-          async
-        ></script>
+        <div id="bookingKitContainer" data-cw="${configId}" ${experienceId ? `data-e="${experienceId}"` : ''}></div>
+        <script src="${scriptUrl}" async></script>
         <script>
           function reportHeight() {
             const newHeight = document.body.scrollHeight;
@@ -115,7 +115,7 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
       >
         {isVisible && (
           <iframe
-            key={`${configId}-${isDark}`}
+            key={`${configId}-${experienceId}-${isDark}`}
             srcDoc={isolatedHtml}
             style={{ height: `${height}px`, width: '100%', border: 'none', overflow: 'hidden' }}
             onLoad={() => {

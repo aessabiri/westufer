@@ -5,10 +5,6 @@ import { Timer, Star, ShoppingBag } from 'lucide-react';
 
 export function VerleihContent() {
 
-  const formatPrice = (cents: number) => {
-    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
-  };
-
   const rentals = [
     {
       category: 'Windsurfen',

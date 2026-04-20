@@ -18,9 +18,9 @@ export function Footer() {
           <div>
             <h4 className="font-bold mb-4">Angebot</h4>
             <ul className="space-y-2 text-slate-400">
-              <li><Link href="/#kurse" className="hover:text-cyan-400 transition-colors">Kurse</Link></li>
+              <li><Link href="/kurse" className="hover:text-cyan-400 transition-colors">Kurse</Link></li>
               <li><Link href="/verleih" className="hover:text-cyan-400 transition-colors">Verleih</Link></li>
-              <li><Link href="/#gruppen" className="hover:text-cyan-400 transition-colors">Gruppen & Events</Link></li>
+              <li><Link href="/kurse/gruppen" className="hover:text-cyan-400 transition-colors">Gruppen & Events</Link></li>
             </ul>
           </div>
           
@@ -39,9 +39,7 @@ export function Footer() {
             © {new Date().getFullYear()} Westufer Kemnade. Alle Rechte vorbehalten.
           </p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Instagram size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Facebook size={20} /></a>
-            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Twitter size={20} /></a>
+            <a href="https://www.facebook.com/westuferkemnade" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors"><Facebook size={20} /></a>
           </div>
         </div>
       </div>

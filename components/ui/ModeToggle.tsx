@@ -6,7 +6,7 @@ import { useTheme } from "next-themes"
 import { motion } from "framer-motion"
 
 export function ModeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
@@ -15,15 +15,18 @@ export function ModeToggle() {
 
   if (!mounted) return null
 
+  // Use resolvedTheme to know if it's ACTUALLY dark (even if set to 'system')
+  const isDark = resolvedTheme === "dark"
+
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white transition-colors relative overflow-hidden"
       aria-label="Toggle Theme"
     >
       <motion.div
         initial={false}
-        animate={{ rotate: theme === "dark" ? 180 : 0, scale: theme === "dark" ? 0 : 1 }}
+        animate={{ rotate: isDark ? 180 : 0, scale: isDark ? 0 : 1 }}
         transition={{ duration: 0.3 }}
         className="absolute inset-0 flex items-center justify-center"
       >
@@ -31,7 +34,7 @@ export function ModeToggle() {
       </motion.div>
       <motion.div
         initial={false}
-        animate={{ rotate: theme === "dark" ? 0 : -180, scale: theme === "dark" ? 1 : 0 }}
+        animate={{ rotate: isDark ? 0 : -180, scale: isDark ? 1 : 0 }}
         transition={{ duration: 0.3 }}
         className="flex items-center justify-center"
       >

@@ -2,51 +2,10 @@
 
 import { motion } from 'framer-motion';
 import { Check, MapPin } from 'lucide-react';
-import Link from 'next/link';
+
 import Image from 'next/image';
-import { Course } from '@/lib/db/types';
 
-interface LongboardContentProps {
-  courses?: Course[];
-}
-
-export function LongboardContent({ courses = [] }: LongboardContentProps) {
-
-  const formatPrice = (cents: number) => {
-    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
-  };
-
-  const displayItems = [
-    { 
-      slug: 'lb-rent-1h',
-      title: 'Verleih (2 Std)', 
-      defaultPrice: '12€', 
-      duration: '120 Minuten', 
-      features: ['Longboard nach Wahl', 'Schutzausrüstung', 'Routen-Tipp'], 
-      targetId: '7', 
-      type: 'rental' 
-    },
-    { 
-      slug: 'lb-rent-day',
-      title: 'Tagesmiete', 
-      defaultPrice: '25€', 
-      duration: 'Den ganzen Tag', 
-      features: ['Maximale Flexibilität', 'Board-Wechsel möglich', 'Perfekt für die Seerunde'], 
-      popular: true, 
-      targetId: '8', 
-      type: 'rental' 
-    },
-    { 
-      slug: 'lb-basic',
-      title: 'Workshop', 
-      defaultPrice: '35€', 
-      duration: '90 Minuten', 
-      features: ['Bremsen & Fallen', 'Kurventechnik', 'Kleingruppe'], 
-      targetId: 'lb-basic', 
-      type: 'course' 
-    },
-  ];
-
+export function LongboardContent() {
   return (
     <>
       {/* Hero */}
@@ -107,44 +66,6 @@ export function LongboardContent({ courses = [] }: LongboardContentProps) {
                       className="object-cover"
                    />
                  </div>
-            </div>
-          </div>
-
-          {/* Pricing */}
-          <div className="mb-20">
-            <h2 className="text-3xl font-bold text-center mb-12">Preise</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {displayItems.map((item) => {
-                 // Try to find price in DB
-                 const dbCourse = courses.find(c => c.slug === item.slug);
-                 const price = dbCourse ? formatPrice(dbCourse.price_cents) : item.defaultPrice;
-
-                return (
-                  <div key={item.title} className={`bg-white dark:bg-slate-900 p-8 rounded-3xl border ${item.popular ? 'border-emerald-500 shadow-xl scale-105' : 'border-slate-200 dark:border-slate-800'} relative`}>
-                    {item.popular && (
-                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                        Best Deal
-                      </span>
-                    )}
-                    <h3 className="text-2xl font-bold mb-2 text-slate-900 dark:text-white">{item.title}</h3>
-                    <div className="text-4xl font-bold text-emerald-600 mb-2">{price}</div>
-                    <p className="text-slate-500 dark:text-slate-400 mb-6">{item.duration}</p>
-                    <ul className="space-y-3 mb-8">
-                      {item.features.map((f) => (
-                        <li key={f} className="text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link 
-                      href="/booking" 
-                      className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
-                    >
-                      Jetzt Buchen
-                    </Link>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>

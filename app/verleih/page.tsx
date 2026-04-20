@@ -1,26 +1,31 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { VerleihContent } from '@/components/sections/VerleihContent';
+import BookingkitWidget from '@/components/features/BookingkitWidget';
 import { Metadata } from 'next';
-import { getRentalItems } from '@/lib/db/queries';
 
 export const metadata: Metadata = {
-  title: "Materialverleih Wassersport | Preise Westufer Kemnade",
-  description: "Preise für Windsurf-Equipment, SUP-Boards und Longboards. Stunden- und Tagesmiete direkt am See.",
+  title: "Materialverleih Kemnader See | Westufer Kemnade",
+  description: "Miete SUP Boards, Windsurf-Equipment oder Longboards direkt am See.",
 };
 
-// Revalidate every hour
-export const revalidate = 3600;
-
-export default async function VerleihPage() {
-  const rentalItems = await getRentalItems();
-
+export default function AllVerleihPage() {
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <main className="min-h-screen bg-white dark:bg-slate-950">
       <Navbar variant="page" />
+      
       <div className="pt-32 pb-20 container mx-auto px-6">
-        <VerleihContent rentalItems={rentalItems} />
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+            Equipment mieten
+          </h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">
+            Wir haben alles, was du für deinen Tag am See brauchst. Einfach online reservieren.
+          </p>
+        </div>
+
+        <BookingkitWidget configId="4b3ab0e8a85a7805e277e2b19583050a" />
       </div>
+
       <Footer />
     </main>
   );

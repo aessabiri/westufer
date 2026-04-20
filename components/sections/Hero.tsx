@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 
 import Image from 'next/image';
 
@@ -37,20 +36,26 @@ export function Hero() {
             Erlebe Wassersport mitten im Ruhrgebiet.
           </p>
           
-          <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
-            <Link 
-              href="#kurse"
-              className="group bg-cyan-500 hover:bg-cyan-400 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-cyan-500/40 hover:-translate-y-1 flex items-center gap-2"
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+            <a 
+              href="/kurse"
+              className="group bg-cyan-500 hover:bg-cyan-400 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-cyan-500/40 hover:-translate-y-1 flex items-center gap-2 w-full md:w-auto justify-center"
             >
               Kurse entdecken
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link 
-              href="/booking"
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1"
+            </a>
+            <a 
+              href="/verleih"
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-8 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1 w-full md:w-auto justify-center text-center"
             >
               Equipment leihen
-            </Link>
+            </a>
+            <a 
+              href="/gutscheine"
+              className="bg-blue-600/20 hover:bg-blue-600/40 backdrop-blur-md text-white border border-blue-400/30 px-8 py-4 rounded-full font-bold text-lg transition-all hover:-translate-y-1 w-full md:w-auto justify-center text-center"
+            >
+              Gutscheine
+            </a>
           </div>
         </motion.div>
       </div>

@@ -4,11 +4,11 @@ import BookingkitWidget from '@/components/features/BookingkitWidget';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Wing-Foilen lernen | Westufer Kemnade",
-  description: "Erlebe das Fliegen über dem Wasser. Wing-Foil Kurse und Workshops am Kemnader See.",
+  title: "Wassersport Kurse am Kemnader See | Westufer Kemnade",
+  description: "Entdecke unser Kursangebot für Windsurfen, SUP, Longboarding und Wing-Foilen.",
 };
 
-export default function WingFoilPage() {
+export default function AllKursePage() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
       <Navbar variant="page" />
@@ -16,14 +16,14 @@ export default function WingFoilPage() {
       <div className="pt-32 pb-20 container mx-auto px-6">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-            Wing-Foilen
+            Unsere Kurse
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            Der neue Trendsport. Lerne mit uns sicher und professionell das &quot;Fliegen&quot; auf dem Foil.
+            Vom Schnupperkurs bis zum Profi-Training. Finde jetzt den passenden Termin.
           </p>
         </div>
 
-        <BookingkitWidget configId="19dcbc42fbc01b0eb7ff50cb207fb257" />
+        <BookingkitWidget configId="4b3ab0e8a85a7805e277e2b19583050a" />
       </div>
 
       <Footer />

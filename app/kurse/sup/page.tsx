@@ -2,7 +2,6 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SupContent } from '@/components/sections/SupContent';
 import { Metadata } from 'next';
-import { getCourses } from '@/lib/db/queries';
 import BookingkitWidget from '@/components/features/BookingkitWidget';
 
 export const metadata: Metadata = {
@@ -13,15 +12,11 @@ export const metadata: Metadata = {
 // Revalidate every hour
 export const revalidate = 3600;
 
-export default async function SupPage() {
-  const courses = await getCourses();
-  // Filter for SUP courses
-  const supCourses = courses.filter(c => c.slug.startsWith('sup-'));
-
+export default function SupPage() {
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
       <Navbar variant="page" />
-      <SupContent courses={supCourses} />
+      <SupContent />
 
       {/* Dedicated Booking Section */}
       <section className="py-20 bg-slate-50 dark:bg-slate-900/50">

@@ -40,13 +40,13 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'SportsActivityLocation',
     name: 'Westufer Kemnade',
-    image: 'https://westufer-kemnade.de/hero-image.jpg', // Placeholder
+    image: 'https://westufer-kemnade.de/hero-image.jpg',
     description: 'Surfschule und Wassersport-Center am Kemnader See. Windsurfen, SUP, Longboard Verleih und Kurse.',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Blumenhaller Weg (Parkplatz P2)',
+      streetAddress: 'Oveneystraße 71 (Bootshallen Gibraltar)',
       addressLocality: 'Bochum',
-      postalCode: '44801',
+      postalCode: '44797',
       addressCountry: 'DE'
     },
     geo: {
@@ -55,7 +55,9 @@ export default function RootLayout({
       longitude: 7.265
     },
     url: 'https://westufer-kemnade.de',
-    telephone: '+491234567890',
+    sameAs: [
+      'https://www.facebook.com/westuferkemnade'
+    ],
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',

@@ -12,11 +12,30 @@ interface BookingkitWidgetProps {
 export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false); // New: Lazy load state
   const [height, setHeight] = useState(800);
   const { resolvedTheme } = useTheme();
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Lazy loading logic: only load the widget when it's near the viewport
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Only load once
+        }
+      },
+      { rootMargin: '200px' } // Start loading when user is 200px away
+    );
+
+    if (wrapperRef.current) {
+      observer.observe(wrapperRef.current);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -31,10 +50,6 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
 
   const isDark = mounted && resolvedTheme === 'dark';
 
-  // We inject specific CSS into the iframe to:
-  // 1. Match the website's dark blue background (#020617)
-  // 2. Invert text and UI elements
-  // 3. PROTECT images and certain icons from being inverted
   const isolatedHtml = `
     <!DOCTYPE html>
     <html lang="de">
@@ -46,21 +61,13 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
             padding: 0; 
             background: ${isDark ? '#020617' : 'transparent'}; 
             overflow: hidden; 
-            transition: background 0.5s ease;
           }
           #bookingKitContainer { 
             width: 100%; 
             ${isDark ? 'filter: invert(0.9) hue-rotate(180deg) brightness(1.1);' : ''}
           }
-          
-          /* Fix images, maps and specific buttons so they don't look like negatives */
           ${isDark ? `
-            img, 
-            [style*="background-image"],
-            .bk-experience-image,
-            .bk-map-container,
-            .bk-button-primary,
-            .bk-date-picker-cell-active { 
+            img, [style*="background-image"], .bk-experience-image, .bk-map-container, .bk-button-primary, .bk-date-picker-cell-active { 
               filter: invert(1) hue-rotate(180deg) brightness(0.9) !important; 
             }
           ` : ''}
@@ -75,9 +82,7 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
         <script>
           function reportHeight() {
             const newHeight = document.body.scrollHeight;
-            if (newHeight > 0) {
-              window.parent.postMessage(newHeight, '*');
-            }
+            if (newHeight > 0) { window.parent.postMessage(newHeight, '*'); }
           }
           setInterval(reportHeight, 500);
           window.onload = reportHeight;
@@ -87,17 +92,16 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
   `;
 
   return (
-    <div className="w-full relative transition-all duration-500 ease-in-out">
-      {isLoading && (
+    <div ref={wrapperRef} className="w-full relative min-h-[400px]">
+      {(!isVisible || isLoading) && (
         <div className={cn(
-          "absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm z-20 h-[600px] rounded-3xl",
+          "absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm z-20 rounded-3xl transition-opacity duration-500",
           isDark ? "bg-slate-950/50" : "bg-white/50"
         )}>
           <Loader2 className="w-10 h-10 text-cyan-500 animate-spin mb-4" />
-          <p className={cn(
-            "font-medium",
-            isDark ? "text-slate-400" : "text-slate-500"
-          )}>Buchungskalender wird geladen...</p>
+          <p className={cn("font-medium", isDark ? "text-slate-400" : "text-slate-500")}>
+            {isVisible ? "Buchungskalender wird geladen..." : "Bereit zum Laden..."}
+          </p>
         </div>
       )}
       
@@ -109,16 +113,18 @@ export default function BookingkitWidget({ configId }: BookingkitWidgetProps) {
           overflow: 'hidden'
         }}
       >
-        <iframe
-          key={`${configId}-${isDark}`} // Re-render iframe when theme changes to apply new styles
-          srcDoc={isolatedHtml}
-          style={{ height: `${height}px`, width: '100%', border: 'none', overflow: 'hidden' }}
-          onLoad={() => {
-            setTimeout(() => setIsLoading(false), 1200);
-          }}
-          title={`booking-widget-${configId}`}
-          scrolling="no"
-        />
+        {isVisible && (
+          <iframe
+            key={`${configId}-${isDark}`}
+            srcDoc={isolatedHtml}
+            style={{ height: `${height}px`, width: '100%', border: 'none', overflow: 'hidden' }}
+            onLoad={() => {
+              setTimeout(() => setIsLoading(false), 1200);
+            }}
+            title={`booking-widget-${configId}`}
+            scrolling="no"
+          />
+        )}
       </div>
     </div>
   );

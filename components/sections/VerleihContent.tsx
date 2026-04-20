@@ -2,26 +2,11 @@
 
 import { motion } from 'framer-motion';
 import { Timer, Star, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
-import { RentalItem } from '@/lib/db/types';
 
-interface VerleihContentProps {
-  rentalItems?: RentalItem[];
-}
-
-export function VerleihContent({ rentalItems = [] }: VerleihContentProps) {
+export function VerleihContent() {
 
   const formatPrice = (cents: number) => {
     return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
-  };
-
-  const findPrice = (name: string, defaultPrice: string) => {
-    // This assumes names in DB match roughly or we use a more complex matching logic.
-    // For simplicity, we'll stick to defaults if no exact match or enhance DB later.
-    // Ideally, DB items should have a 'display_category' or similar.
-    // Since our seed data was limited, we'll check if we find a price, else default.
-    const item = rentalItems.find(i => i.name === name);
-    return item ? formatPrice(item.price_per_hour_cents) : defaultPrice;
   };
 
   const rentals = [
@@ -80,20 +65,12 @@ export function VerleihContent({ rentalItems = [] }: VerleihContentProps) {
           >
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b dark:border-slate-800 pb-4">{cat.category}</h3>
             <ul className="space-y-4">
-              {cat.items.map((item) => {
-                // Fuzzy match or direct match logic
-                // For "Windsurf Board + Rigg" in DB vs local name
-                // We'll try to find an item that *starts with* or *includes* the name
-                const dbItem = rentalItems.find(ri => item.name.includes(ri.name) || ri.name.includes(item.name));
-                const price = dbItem ? formatPrice(dbItem.price_per_hour_cents) : item.defaultPrice;
-
-                return (
-                  <li key={item.name} className="flex justify-between items-center text-slate-700 dark:text-slate-300">
-                    <span>{item.name}</span>
-                    <span className="font-bold text-cyan-600 dark:text-cyan-400">{price}</span>
-                  </li>
-                );
-              })}
+              {cat.items.map((item) => (
+                <li key={item.name} className="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                  <span>{item.name}</span>
+                  <span className="font-bold text-cyan-600 dark:text-cyan-400">{item.defaultPrice}</span>
+                </li>
+              ))}
             </ul>
           </motion.div>
         ))}
@@ -119,12 +96,12 @@ export function VerleihContent({ rentalItems = [] }: VerleihContentProps) {
             </span>
           </div>
         </div>
-        <Link 
+        <a 
           href="/booking"
           className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold text-lg whitespace-nowrap transition-colors"
         >
           Material reservieren
-        </Link>
+        </a>
       </div>
     </>
   );

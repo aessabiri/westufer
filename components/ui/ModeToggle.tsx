@@ -24,7 +24,7 @@ export function ModeToggle() {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "relative w-16 h-9 flex items-center rounded-full px-1 transition-colors duration-500 shadow-inner group focus:outline-none ring-offset-2 focus:ring-2 ring-cyan-500",
+        "relative w-16 h-9 flex items-center rounded-full px-1 transition-colors duration-200 shadow-inner group focus:outline-none ring-offset-2 focus:ring-2 ring-cyan-500",
         isDark ? "bg-slate-900 border border-slate-800" : "bg-cyan-100 border border-cyan-200"
       )}
       aria-label="Toggle Dark Mode"
@@ -41,14 +41,14 @@ export function ModeToggle() {
         layout
         transition={{
           type: "spring",
-          stiffness: 500,
-          damping: 30
+          stiffness: 700,
+          damping: 25
         }}
         animate={{
           x: isDark ? 28 : 0,
         }}
         className={cn(
-          "z-10 w-7 h-7 rounded-full flex items-center justify-center shadow-lg transition-transform",
+          "z-10 w-7 h-7 rounded-full flex items-center justify-center shadow-lg",
           isDark 
             ? "bg-slate-800 text-yellow-400" 
             : "bg-white text-cyan-600"
@@ -58,7 +58,7 @@ export function ModeToggle() {
           <motion.div
             initial={{ scale: 0, rotate: -90 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             <Moon size={16} fill="currentColor" />
           </motion.div>
@@ -66,7 +66,7 @@ export function ModeToggle() {
           <motion.div
             initial={{ scale: 0, rotate: 90 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           >
             <Sun size={16} fill="currentColor" />
           </motion.div>

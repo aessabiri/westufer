@@ -137,7 +137,7 @@ export function SupContent({ courses = [] }: SupContentProps) {
                       ))}
                     </ul>
                     <Link 
-                      href={item.type === 'rental' ? `/booking/verleih?item=${item.targetId}` : `/booking/kurse?course=${dbCourse ? dbCourse.id : item.targetId}`} 
+                      href="/booking" 
                       className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${item.popular ? 'bg-cyan-500 hover:bg-cyan-600 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
                     >
                       Jetzt Buchen

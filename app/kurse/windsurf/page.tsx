@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { WindsurfContent } from '@/components/sections/WindsurfContent';
 import { Metadata } from 'next';
 import { getCourses } from '@/lib/db/queries';
+import BookingkitWidget from '@/components/features/BookingkitWidget';
 
 export const metadata: Metadata = {
   title: "Windsurfen lernen Bochum | Westufer Kemnade",
@@ -19,8 +20,24 @@ export default async function WindsurfPage() {
 
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950">
-      <Navbar />
+      <Navbar variant="page" />
       <WindsurfContent courses={windsurfCourses} />
+
+      {/* Dedicated Booking Section */}
+      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Windsurfkurs jetzt buchen
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400">
+              Wähle deinen passenden Termin und starte dein Abenteuer auf dem Wasser.
+            </p>
+          </div>
+          <BookingkitWidget configId="1253e1a9a19995e6966cf2bf6d4dbd36" />
+        </div>
+      </section>
+
       <Footer />
     </main>
   );

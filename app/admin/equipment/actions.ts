@@ -30,6 +30,6 @@ export async function updateEquipment(formData: FormData) {
   }
 
   revalidatePath('/admin/equipment')
-  revalidatePath('/booking/verleih')
+  revalidatePath('/booking')
   return { success: true }
 }

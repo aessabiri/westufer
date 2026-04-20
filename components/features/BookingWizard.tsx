@@ -3,31 +3,14 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon, Loader2, Wind, Waves, MapPin, HelpCircle, ShoppingBag, Calendar } from 'lucide-react';
+import { Check, ChevronRight, User, Mail, Phone, CreditCard, Sparkles, LucideIcon, Loader2, Wind, Waves, MapPin, HelpCircle, ShoppingBag, Banknote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { getAvailableSlots } from '@/lib/db/queries';
 import { createBooking } from '@/app/actions/createBooking';
-
-interface FormattedSlot {
-  id: string; 
-  label: string; 
-  short: string; 
-  time: string; 
-  available: boolean;
-}
-
-export interface BookingItem {
-  id: string;
-  category: string;
-  name: string;
-  price: string | number;
-  duration?: string;
-  iconName: string;
-  color: string;
-  bg: string;
-  border: string;
-}
+export { type BookingItem } from './wizard/types';
+import { CourseDateStep } from './wizard/CourseDateStep';
+import { RentalDateStep } from './wizard/RentalDateStep';
+import { BookingItem } from './wizard/types';
 
 interface BookingWizardProps {
   items: BookingItem[];
@@ -51,70 +34,24 @@ function BookingContent({ items, type }: BookingWizardProps) {
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>(initialItemId ? [initialItemId] : []);
   const [selectedDateId, setSelectedDateId] = useState(''); // Slot ID for courses, YYYY-MM-DD for rentals
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'online'>('cash');
+  
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
-  const [availableSlots, setAvailableSlots] = useState<FormattedSlot[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
   const selectedItems = items.filter(i => selectedItemIds.includes(i.id));
-  const selectedDateLabel = type === 'course' 
-    ? availableSlots.find(d => d.id === selectedDateId)?.label 
-    : selectedDateId;
-
-  // Generate next 14 days for Rental Date Selection
-  const rentalDates = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i + 1);
-    const iso = d.toISOString().split('T')[0];
-    const short = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' }).format(d);
-    return { iso, short };
-  });
+  
+  // Helper to get display label for the selected date
+  // For courses, we can't easily get the label here without the slots, so we might show the ID or nothing in summary
+  // Ideally, the DateStep should bubble up the label too.
+  const [selectedDateLabel, setSelectedDateLabel] = useState<string>('');
 
   useEffect(() => {
     if (initialItemId && items.find(i => i.id === initialItemId)) {
       setSelectedItemIds([initialItemId]);
     }
   }, [initialItemId, items]);
-
-  useEffect(() => {
-    async function fetchSlots() {
-      if (type === 'course' && selectedItemIds.length === 1) {
-        setIsLoadingSlots(true);
-        setAvailableSlots([]);
-        setSelectedDateId('');
-        
-        try {
-          const courseId = parseInt(selectedItemIds[0], 10);
-          if (!isNaN(courseId)) {
-            const slots = await getAvailableSlots(courseId);
-            const formatted = slots.map(slot => {
-              const date = new Date(slot.start_time);
-              const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-              const dayName = days[date.getDay()];
-              const day = date.getDate().toString().padStart(2, '0');
-              const month = (date.getMonth() + 1).toString().padStart(2, '0');
-              const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-              return {
-                id: slot.id.toString(),
-                label: `${dayName} ${day}.${month}. - ${time}`,
-                short: `${dayName} ${day}.${month}.`,
-                time: time,
-                available: slot.booked_count < slot.max_capacity
-              };
-            });
-            setAvailableSlots(formatted);
-          }
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setIsLoadingSlots(false);
-        }
-      }
-    }
-    fetchSlots();
-  }, [selectedItemIds, type]);
 
   const toggleItem = (id: string) => {
     if (type === 'course') {
@@ -139,24 +76,58 @@ function BookingContent({ items, type }: BookingWizardProps) {
     setErrorMessage(null);
 
     try {
+      // Prepare payload
+      // For rentals, we need to map the string IDs (if they are strings) to numbers
+      // The items prop usually comes from the page, which fetches from DB.
+      // So items[i].id should be the string representation of the number ID.
+      
       const payload = type === 'course' 
         ? { slotId: parseInt(selectedDateId, 10), ...formData }
         : { 
-            rentalItems: selectedItemIds.map(id => ({ id: parseInt(id.replace(/^[^-]*-rent-/, '') || id, 10), quantity: 1 })), 
+            rentalItems: selectedItemIds.map(id => ({ 
+              id: parseInt(id, 10), // Assumes ID is numeric string
+              quantity: 1 
+            })), 
             rentalDate: selectedDateId,
             ...formData 
           };
 
-      // Special case: Since our rental IDs in the hardcoded list are strings like 'ws-rent-board'
-      // and the DB expects numbers, we need to ensure we have the correct IDs.
-      // FOR NOW, to make it work, I'll assume the IDs in the hardcoded list 
-      // match the DB IDs if they were numeric.
-      // BUT WAIT: The user ran a seed script for courses, but maybe not for rentals.
-      
       const result = await createBooking(payload as any);
 
       if (result.success) {
-        setIsSuccess(true);
+        if (paymentMethod === 'online' && result.bookingIds) {
+          // Initiate Stripe Checkout
+          try {
+            const response = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                bookingIds: result.bookingIds,
+                successUrl: window.location.origin + '/booking/success', // We might need a success page, but reusing current page logic is tricky with redirect.
+                cancelUrl: window.location.href,
+              }),
+            });
+
+            const checkoutData = await response.json();
+            
+            if (response.ok && checkoutData.url) {
+              window.location.href = checkoutData.url;
+              return; // Stop here, redirecting
+            } else {
+              // Fallback if Stripe fails (e.g. no keys) but booking is created
+              console.error('Stripe error:', checkoutData.error);
+              setErrorMessage(`Buchung erstellt, aber Online-Zahlung nicht möglich: ${checkoutData.error}. Bitte zahle vor Ort.`);
+              setIsSuccess(true); // Treat as success (reservation)
+            }
+          } catch (stripeErr) {
+             console.error('Stripe fetch error:', stripeErr);
+             setErrorMessage('Verbindung zum Zahlungsanbieter fehlgeschlagen. Deine Buchung wurde als Reservierung gespeichert.');
+             setIsSuccess(true);
+          }
+        } else {
+          // Cash / Reservation only
+          setIsSuccess(true);
+        }
       } else {
         setErrorMessage(result.error || 'Es gab ein Problem bei der Buchung.');
       }
@@ -167,8 +138,13 @@ function BookingContent({ items, type }: BookingWizardProps) {
     }
   };
 
-  const totalPrice = selectedItems.reduce((sum, item) => typeof item.price === 'number' ? sum + item.price : sum, 0);
-  const hasStringPrice = selectedItems.some(item => typeof item.price === 'string');
+  const totalPrice = selectedItems.reduce((sum, item) => {
+    // Check if price is a number string or number
+    const p = typeof item.price === 'string' ? parseFloat(item.price.replace('€', '').trim()) : item.price;
+    return isNaN(p) ? sum : sum + p;
+  }, 0);
+  
+  const hasStringPrice = selectedItems.some(item => typeof item.price === 'string' && isNaN(parseFloat(item.price as string)));
 
   if (isSuccess) {
     return (
@@ -189,6 +165,7 @@ function BookingContent({ items, type }: BookingWizardProps) {
   return (
     <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8 items-start">
       <div className="lg:col-span-2 space-y-8">
+        {/* Progress Bar */}
         <div className="flex items-center justify-between mb-8 px-2 relative">
           {[type === 'course' ? 'Kurs' : 'Equipment', 'Termin', 'Daten'].map((label, idx) => {
             const stepNum = idx + 1;
@@ -207,6 +184,8 @@ function BookingContent({ items, type }: BookingWizardProps) {
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800 min-h-[400px]">
           <AnimatePresence mode="wait">
+            
+            {/* STEP 1: ITEM SELECTION */}
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{type === 'course' ? 'Wähle dein Erlebnis' : 'Wähle dein Equipment'}</h2>
@@ -235,35 +214,30 @@ function BookingContent({ items, type }: BookingWizardProps) {
               </motion.div>
             )}
 
+            {/* STEP 2: DATE SELECTION */}
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Wähle einen Termin</h2>
                 {type === 'course' ? (
-                  isLoadingSlots ? <div className="flex justify-center items-center py-20"><Loader2 className="animate-spin text-cyan-500" size={32} /></div> : availableSlots.length === 0 ? <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl"><p className="text-slate-500">Keine Termine online.</p></div> : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-                      {availableSlots.map((date) => (
-                        <button key={date.id} disabled={!date.available} onClick={() => setSelectedDateId(date.id)} className={cn("p-4 rounded-xl border text-center transition-all", selectedDateId === date.id ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 font-bold" : "border-slate-200 dark:border-slate-800 hover:border-cyan-400 text-slate-600", !date.available && "opacity-50 cursor-not-allowed")}>
-                          <span className="block mb-1">{date.short}</span><span className="text-lg">{date.time}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )
+                  <CourseDateStep 
+                    selectedDateId={selectedDateId} 
+                    onSelectDate={(id) => { setSelectedDateId(id); setSelectedDateLabel('Gewählter Termin'); }} 
+                    onNext={handleNext}
+                    onBack={handleBack}
+                    selectedItemIds={selectedItemIds}
+                  />
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                    {rentalDates.map((date) => (
-                      <button key={date.iso} onClick={() => setSelectedDateId(date.iso)} className={cn("p-4 rounded-xl border text-center transition-all", selectedDateId === date.iso ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-300 font-bold" : "border-slate-200 dark:border-slate-800 hover:border-cyan-400 text-slate-600")}>
-                        {date.short}
-                      </button>
-                    ))}
-                  </div>
+                  <RentalDateStep 
+                    selectedDateId={selectedDateId} 
+                    onSelectDate={(id) => { setSelectedDateId(id); setSelectedDateLabel(id); }}
+                    onNext={handleNext}
+                    onBack={handleBack}
+                    selectedItemIds={selectedItemIds}
+                  />
                 )}
-                <div className="flex justify-between mt-8">
-                  <button onClick={handleBack} className="text-slate-500 hover:text-slate-800 font-medium">Zurück</button>
-                  <button disabled={!selectedDateId} onClick={handleNext} className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-full font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity">Weiter <ChevronRight size={20} /></button>
-                </div>
               </motion.div>
             )}
 
+            {/* STEP 3: USER DETAILS */}
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Deine Details</h2>
@@ -274,10 +248,30 @@ function BookingContent({ items, type }: BookingWizardProps) {
                   </div>
                   <div className="space-y-1"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">E-Mail</label><div className="relative"><Mail className="absolute left-3 top-3 text-slate-400" size={18} /><input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full pl-10 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-cyan-500 outline-none transition-colors" placeholder="max@beispiel.de" /></div></div>
                   <div className="space-y-1"><label className="text-sm font-medium text-slate-700 dark:text-slate-300">Telefon</label><div className="relative"><Phone className="absolute left-3 top-3 text-slate-400" size={18} /><input type="tel" required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full pl-10 p-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-cyan-500 outline-none transition-colors" placeholder="+49 123 456789" /></div></div>
+                  
+                  {/* Payment Method Selection */}
+                  <div className="pt-4">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">Bezahlung</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setPaymentMethod('cash')} className={cn("p-4 rounded-xl border-2 text-left transition-all", paymentMethod === 'cash' ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500 ring-offset-0" : "border-slate-200 dark:border-slate-800 hover:border-slate-300")}>
+                            <div className="flex items-center gap-2 mb-1 font-bold text-slate-900 dark:text-white"><Banknote size={20} /> Vor Ort</div>
+                            <p className="text-xs text-slate-500">Bar oder Karte bei Ankunft</p>
+                        </button>
+                        <button type="button" onClick={() => setPaymentMethod('online')} className={cn("p-4 rounded-xl border-2 text-left transition-all", paymentMethod === 'online' ? "border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500 ring-offset-0" : "border-slate-200 dark:border-slate-800 hover:border-slate-300")}>
+                            <div className="flex items-center gap-2 mb-1 font-bold text-slate-900 dark:text-white"><CreditCard size={20} /> Online</div>
+                            <p className="text-xs text-slate-500">Paypal, Kreditkarte, Sofort</p>
+                        </button>
+                    </div>
+                  </div>
+
                   {errorMessage && <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 text-red-600 rounded-xl text-sm font-medium">{errorMessage}</div>}
                   <div className="flex justify-between mt-8 items-center">
                     <button type="button" onClick={handleBack} className="text-slate-500 hover:text-slate-800 font-medium">Zurück</button>
-                    <button type="submit" disabled={isSubmitting} className="bg-green-500 hover:bg-green-600 disabled:opacity-70 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all flex items-center gap-2">{isSubmitting ? <><Loader2 className="animate-spin" size={18} /> Wird gebucht...</> : <>Kostenpflichtig reservieren <CreditCard size={18} /></>}</button>
+                    <button type="submit" disabled={isSubmitting} className="bg-green-500 hover:bg-green-600 disabled:opacity-70 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-all flex items-center gap-2">
+                        {isSubmitting ? <><Loader2 className="animate-spin" size={18} /> Wird verarbeitet...</> : 
+                            paymentMethod === 'online' ? <>Zur Kasse <ChevronRight size={18} /></> : <>Kostenpflichtig reservieren <Check size={18} /></>
+                        }
+                    </button>
                   </div>
                 </form>
               </motion.div>

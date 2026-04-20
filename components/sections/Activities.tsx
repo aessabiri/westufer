@@ -13,7 +13,7 @@ const activities = [
     icon: Wind,
     color: 'bg-blue-500',
     image: 'https://images.unsplash.com/photo-1599405758676-66412adbe26e?q=80&w=1000&auto=format&fit=crop', // Windsurfing Lake
-    link: '/kurse/windsurf'
+    link: '/booking'
   },
   {
     id: 'sup',
@@ -22,7 +22,7 @@ const activities = [
     icon: Waves,
     color: 'bg-cyan-500',
     image: 'https://images.unsplash.com/photo-1661089209976-45c2cbcb24e9?q=80&w=1000&auto=format&fit=crop', // SUP Lake
-    link: '/kurse/sup'
+    link: '/booking'
   },
   {
     id: 'longboard',
@@ -31,7 +31,7 @@ const activities = [
     icon: MapPin, // Exploring path
     color: 'bg-emerald-500',
     image: 'https://images.unsplash.com/photo-1536796038751-bb018f95ca01?w=1000&auto=format&fit=crop', // Longboard Road
-    link: '/kurse/longboard'
+    link: '/booking'
   }
 ];
 

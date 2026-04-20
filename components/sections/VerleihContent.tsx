@@ -120,7 +120,7 @@ export function VerleihContent({ rentalItems = [] }: VerleihContentProps) {
           </div>
         </div>
         <Link 
-          href="/booking/verleih"
+          href="/booking"
           className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-4 rounded-full font-bold text-lg whitespace-nowrap transition-colors"
         >
           Material reservieren

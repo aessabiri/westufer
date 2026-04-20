@@ -154,7 +154,7 @@ export function WindsurfContent({ courses = [] }: WindsurfContentProps) {
                       ))}
                     </ul>
                     <Link 
-                      href={`/booking/kurse?course=${dbCourse ? dbCourse.id : course.id}`} 
+                      href="/booking" 
                       className={`block w-full text-center py-3 rounded-xl font-bold transition-all ${course.popular ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white'}`}
                     >
                       Jetzt Buchen

@@ -1,24 +1,29 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import BookingkitWidget from '@/components/features/BookingkitWidget';
+import { Metadata } from 'next';
 
-export default function BookingPage() {
+export const metadata: Metadata = {
+  title: "Wing-Foilen lernen | Westufer Kemnade",
+  description: "Erlebe das Fliegen über dem Wasser. Wing-Foil Kurse und Workshops am Kemnader See.",
+};
+
+export default function WingFoilPage() {
   return (
-    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <main className="min-h-screen bg-white dark:bg-slate-950">
       <Navbar variant="page" />
       
       <div className="pt-32 pb-20 container mx-auto px-6">
         <div className="max-w-4xl mx-auto text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-            Buchen & Gutscheine
+            Wing-Foilen
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            Wähle dein Erlebnis am Kemnader See. Alle Kurse und Verleih-Optionen direkt online buchen.
+            Der neue Trendsport. Lerne mit uns sicher und professionell das "Fliegen" auf dem Foil.
           </p>
         </div>
 
-        {/* The Bookingkit Widget */}
-        <BookingkitWidget configId="4b3ab0e8a85a7805e277e2b19583050a" />
+        <BookingkitWidget configId="19dcbc42fbc01b0eb7ff50cb207fb257" />
       </div>
 
       <Footer />

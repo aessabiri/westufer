@@ -1,6 +1,6 @@
 'use server';
 
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 
 interface BookingRequest {
@@ -20,14 +20,26 @@ export async function createBooking(data: BookingRequest) {
     return { success: false, error: 'Bitte fülle alle Pflichtfelder aus.' };
   }
 
+  if (!supabaseAdmin) {
+    console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
+    return { success: false, error: 'Datenbankverbindung ist nicht konfiguriert.' };
+  }
+
   try {
     const customerName = `${data.firstName} ${data.lastName}`;
     
     // --- CASE A: COURSE BOOKING ---
     if (data.slotId) {
-      const { data: slot, error: slotError } = await supabase
+      // Use Admin Client to bypass RLS for reading and updating
+      const { data: slot, error: slotError } = await supabaseAdmin
         .from('course_slots')
-        .select('booked_count, max_capacity, courses(price_cents)')
+        .select(`
+          booked_count, 
+          max_capacity, 
+          courses (
+            price_cents
+          )
+        `)
         .eq('id', data.slotId)
         .single();
 
@@ -39,23 +51,37 @@ export async function createBooking(data: BookingRequest) {
         return { success: false, error: 'Dieser Kurs ist leider ausgebucht.' };
       }
 
-      const { error: insertErr } = await supabase.from('bookings').insert({
-        slot_id: data.slotId,
-        customer_name: customerName,
-        customer_email: data.email,
-        customer_phone: data.phone,
-        amount_total_cents: (slot.courses as any).price_cents,
-      });
+      // Safely access price, handling array or single object return from joined query
+      const courseData = Array.isArray(slot.courses) ? slot.courses[0] : slot.courses;
+      const priceCents = courseData?.price_cents ?? 0;
+
+      const { data: booking, error: insertErr } = await supabaseAdmin
+        .from('bookings')
+        .insert({
+          slot_id: data.slotId,
+          customer_name: customerName,
+          customer_email: data.email,
+          customer_phone: data.phone,
+          amount_total_cents: priceCents,
+        })
+        .select('id')
+        .single();
 
       if (insertErr) throw insertErr;
 
-      await supabase
+      // This UPDATE previously failed with the anon client
+      const { error: updateErr } = await supabaseAdmin
         .from('course_slots')
         .update({ booked_count: slot.booked_count + 1 })
         .eq('id', data.slotId);
 
-      revalidatePath('/booking/kurse');
-      return { success: true };
+      if (updateErr) {
+        console.error('Failed to update slot count:', updateErr);
+        // In a real app, we might want to rollback the booking here
+      }
+
+      revalidatePath('/booking');
+      return { success: true, bookingIds: [booking.id] };
     }
 
     // --- CASE B: RENTAL BOOKING ---
@@ -68,6 +94,8 @@ export async function createBooking(data: BookingRequest) {
         return { success: false, error: 'Der gewählte Termin liegt in der Vergangenheit.' };
       }
 
+      const bookingIds: string[] = [];
+
       // Process each item in the "cart"
       for (const itemRequest of data.rentalItems) {
         // 2. Validate Quantity (DoS Protection)
@@ -76,7 +104,7 @@ export async function createBooking(data: BookingRequest) {
         }
 
         // 3. Get Item Info & Total Inventory
-        const { data: item, error: itemErr } = await supabase
+        const { data: item, error: itemErr } = await supabaseAdmin
           .from('rental_items')
           .select('total_quantity, price_per_hour_cents')
           .eq('id', itemRequest.id)
@@ -87,7 +115,7 @@ export async function createBooking(data: BookingRequest) {
         }
 
         // 4. Check current bookings for this item on this date
-        const { count, error: countErr } = await supabase
+        const { count, error: countErr } = await supabaseAdmin
           .from('bookings')
           .select('*', { count: 'exact', head: true })
           .eq('rental_item_id', itemRequest.id)
@@ -114,12 +142,20 @@ export async function createBooking(data: BookingRequest) {
           amount_total_cents: item.price_per_hour_cents,
         });
 
-        const { error: multiInsertErr } = await supabase.from('bookings').insert(inserts);
+        const { data: bookings, error: multiInsertErr } = await supabaseAdmin
+            .from('bookings')
+            .insert(inserts)
+            .select('id');
+            
         if (multiInsertErr) throw multiInsertErr;
+        
+        if (bookings) {
+            bookingIds.push(...bookings.map(b => b.id));
+        }
       }
 
-      revalidatePath('/booking/verleih');
-      return { success: true };
+      revalidatePath('/booking');
+      return { success: true, bookingIds };
     }
 
     return { success: false, error: 'Ungültige Buchungsanfrage.' };

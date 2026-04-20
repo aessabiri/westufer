@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
 const adventures = [
-  { id: 1, name: 'SUP Einsteigerkurs', experienceId: 'f701a2f3aec2462ead853b82b2df1c25', category: 'SUP', price: '45€', description: 'Perfekt für den entspannten Start auf dem Wasser.', image: 'https://images.unsplash.com/photo-1596522512683-11a3d9021669?q=80&w=800&auto=format&fit=crop' },
+  { id: 1, name: 'SUP Einsteigerkurs', experienceId: 'f701a2f3aec2462ead853b82b2df1c25', category: 'SUP', price: '45€', description: 'Perfekt für den entspannten Start auf dem Wasser.', image: 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?q=80&w=800&auto=format&fit=crop' },
   { id: 2, name: 'SUP Aufsteigerkurs', experienceId: '617b80a881f87a174a0e0f190327cffd', category: 'SUP', price: '65€', description: 'Verfeinere deine Technik und lerne Profi-Tricks.', image: 'https://images.unsplash.com/photo-1517176118179-65244903d13c?q=80&w=800&auto=format&fit=crop' },
   { id: 3, name: 'SUP Kids & Eltern', experienceId: 'a1b85009f53c5f3b70763cc52ef39a88', category: 'Kids', price: '55€', description: 'Familienspaß für Groß und Klein.', image: 'https://images.unsplash.com/photo-1520626337972-ebf863448db6?q=80&w=800&auto=format&fit=crop' },
   { id: 4, name: 'Kindergeburtstag SUP', experienceId: '44ac637731403852b7fb4e8d97bc5640', category: 'Kids', price: 'ab 150€', description: 'Die coolste Party auf dem Kemnader See.', image: 'https://images.unsplash.com/photo-1531058240690-006c446962d8?q=80&w=800&auto=format&fit=crop' },
@@ -29,7 +29,7 @@ const adventures = [
   { id: 19, name: 'Schulangebot: SUP', experienceId: '19a2cc65a3797e4198c70832af22c516', category: 'Gruppen', price: 'Anfrage', description: 'Klassenausflug mit Sport und Teamgeist.', image: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=800&auto=format&fit=crop' },
   { id: 20, name: 'Schulangebot: SUP Tour', experienceId: 'eaf48e96c2d51849da55c67615767655', category: 'Gruppen', price: 'Anfrage', description: 'Entdeckungstour über den Kemnader See.', image: 'https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?q=80&w=800&auto=format&fit=crop' },
   { id: 21, name: 'Schulangebot: Longboard', experienceId: 'e9d7203c030f34ad7f654b5f36aa512f', category: 'Gruppen', price: 'Anfrage', description: 'Sicher skaten lernen in der Gruppe.', image: 'https://images.unsplash.com/photo-1520116468816-95b69f847357?q=80&w=800&auto=format&fit=crop' },
-  { id: 22, name: 'Team: SUP Einführung', experienceId: 'a7df3f5c7611502924a5383f5ccf8bdc', category: 'Gruppen', price: 'Anfrage', description: 'Das perfekte Event für Firmen und Vereine.', image: 'https://images.unsplash.com/photo-1536859355448-76f92eb7a3de?q=80&w=800&auto=format&fit=crop' },
+  { id: 22, name: 'Team: SUP Einführung', experienceId: 'a7df3f5c7611502924a5383f5ccf8bdc', category: 'Gruppen', price: 'Anfrage', description: 'Das perfekte Event für Firmen und Vereine.', image: 'https://images.unsplash.com/photo-1534234828569-1f27c71f3088?q=80&w=800&auto=format&fit=crop' },
   { id: 23, name: 'Team: SUP Polo', experienceId: 'a0762f01276af6278e17a35f13ede63f', category: 'Gruppen', price: 'Anfrage', description: 'Actionreiches Wasser-Polo auf SUP Boards.', image: 'https://images.unsplash.com/photo-1414442323120-144be03dca6a?q=80&w=800&auto=format&fit=crop' },
   { id: 24, name: 'Teambuilding Event', experienceId: '64c8b962e82cbe85515231f9174abef3', category: 'Gruppen', price: 'Anfrage', description: 'Stärke dein Team mit gemeinsamen Wasser-Challenges.', image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=800&auto=format&fit=crop' },
   { id: 25, name: 'Family SUP Tour', experienceId: '043388f328335706cbe50eb567b42775', category: 'SUP', price: '25€', description: 'Entspannte Tour über den See für alle Level.', image: 'https://images.unsplash.com/photo-1510332859919-05653b647688?q=80&w=800&auto=format&fit=crop' }
@@ -38,7 +38,7 @@ const adventures = [
 export function AdventureCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAdventure, setSelectedAdventure] = useState<typeof adventures[0] | null>(null);
-  
+
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % adventures.length);
   }, []);
@@ -53,7 +53,6 @@ export function AdventureCarousel() {
     return () => clearInterval(timer);
   }, [selectedAdventure, handleNext]);
 
-  // Infinite display logic: we map the array to show surrounding items
   const getVisibleAdventures = () => {
     const items = [];
     for (let i = -1; i <= 3; i++) {
@@ -76,29 +75,27 @@ export function AdventureCarousel() {
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          {/* Main Viewport */}
           <div className="relative h-[550px] flex items-center justify-center overflow-visible">
             <AnimatePresence initial={false} mode="popLayout">
               {getVisibleAdventures().map((item, i) => {
                 const isCenter = item.position === 1;
                 const isSide = item.position === 0 || item.position === 2;
                 
-                if (!isCenter && !isSide) return null; // Only render 3
+                if (!isCenter && !isSide) return null;
 
                 return (
                   <motion.div
                     key={`${item.experienceId}-${item.id}`}
                     initial={{ opacity: 0, x: item.position > 1 ? 100 : -100, scale: 0.8 }}
                     animate={{ 
-                        opacity: isCenter ? 1 : 0.4, 
-                        x: (item.position - 1) * 400, // Move based on position
-                        scale: isCenter ? 1 : 0.85,
-                        zIndex: isCenter ? 20 : 10,
-                        filter: isCenter ? 'blur(0px)' : 'blur(2px)'
+                        opacity: isCenter ? 1 : 0.6, 
+                        x: (item.position - 1) * (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 400), 
+                        scale: isCenter ? 1 : 0.9,
+                        zIndex: isCenter ? 20 : 10
                     }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                    className="absolute w-[350px] shrink-0"
+                    className="absolute w-[300px] md:w-[350px] shrink-0"
                   >
                     <div className={cn(
                       "relative h-[480px] rounded-[3rem] overflow-hidden shadow-2xl bg-slate-900 border-4 transition-all duration-700",
@@ -108,7 +105,7 @@ export function AdventureCarousel() {
                         src={item.image} 
                         alt={item.name} 
                         fill 
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 300px, 350px"
                         className="object-cover opacity-60" 
                         priority={isCenter}
                       />
@@ -143,7 +140,6 @@ export function AdventureCarousel() {
             </AnimatePresence>
           </div>
 
-          {/* Navigation Controls */}
           <div className="absolute top-1/2 -left-4 md:-left-8 -translate-y-1/2 z-40">
             <button onClick={handlePrev} className="p-4 rounded-full bg-white dark:bg-slate-800 shadow-2xl text-slate-900 dark:text-white hover:scale-110 transition-transform active:scale-95 border border-slate-100 dark:border-slate-800">
               <ChevronLeft size={28} />
@@ -156,7 +152,6 @@ export function AdventureCarousel() {
           </div>
         </div>
 
-        {/* Dynamic Indicators */}
         <div className="flex justify-center gap-1.5 mt-12 overflow-x-auto max-w-full px-4 no-scrollbar">
           {adventures.map((_, i) => (
             <button
@@ -171,7 +166,6 @@ export function AdventureCarousel() {
         </div>
       </div>
 
-      {/* MODAL OVERLAY */}
       <AnimatePresence>
         {selectedAdventure && (
           <motion.div 
@@ -196,11 +190,12 @@ export function AdventureCarousel() {
               <div className="flex-1 overflow-y-auto p-6 md:p-12">
                 <div className="mb-8">
                    <h2 className="text-3xl font-bold mb-2 text-slate-900 dark:text-white">{selectedAdventure.name}</h2>
-                   <p className="text-slate-500">{selectedAdventure.description}</p>
+                   <p className="text-slate-500 dark:text-slate-400">{selectedAdventure.description}</p>
                 </div>
                 <BookingkitWidget 
                   configId="51bdc608442c342ef82a1ac41cf65754" 
                   experienceId={selectedAdventure.experienceId} 
+                  isInModal={true}
                 />
               </div>
             </motion.div>

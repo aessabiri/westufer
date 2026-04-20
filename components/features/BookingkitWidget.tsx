@@ -7,10 +7,11 @@ import { cn } from '@/lib/utils';
 
 interface BookingkitWidgetProps {
   configId: string;
-  experienceId?: string; // New: Optional ID for specific items
+  experienceId?: string;
+  isInModal?: boolean; // New: context flag
 }
 
-export default function BookingkitWidget({ configId, experienceId }: BookingkitWidgetProps) {
+export default function BookingkitWidget({ configId, experienceId, isInModal = false }: BookingkitWidgetProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -49,8 +50,11 @@ export default function BookingkitWidget({ configId, experienceId }: BookingkitW
   }, []);
 
   const isDark = mounted && resolvedTheme === 'dark';
+  
+  // Use specific dark colors to match site depth
+  // Modal background is typically #0f172a (slate-900)
+  const bgColor = isDark ? (isInModal ? '#0f172a' : '#020617') : '#ffffff';
 
-  // Construct the script URL with experienceId if present
   const scriptUrl = `https://848330c015276c47b62dc51d28dbae1e.widget.bookingkit.net/bkscript/${configId}/${experienceId ? `?e=${experienceId}` : ''}`;
 
   const isolatedHtml = `
@@ -62,8 +66,9 @@ export default function BookingkitWidget({ configId, experienceId }: BookingkitW
           body { 
             margin: 0; 
             padding: 0; 
-            background: ${isDark ? '#020617' : 'transparent'}; 
+            background: ${bgColor}; 
             overflow: hidden; 
+            transition: background 0.3s ease;
           }
           #bookingKitContainer { 
             width: 100%; 
@@ -73,6 +78,8 @@ export default function BookingkitWidget({ configId, experienceId }: BookingkitW
             img, [style*="background-image"], .bk-experience-image, .bk-map-container, .bk-button-primary, .bk-date-picker-cell-active { 
               filter: invert(1) hue-rotate(180deg) brightness(0.9) !important; 
             }
+            /* Refined text contrast for deep backgrounds */
+            body { color: #f1f5f9; }
           ` : ''}
         </style>
       </head>
@@ -108,14 +115,14 @@ export default function BookingkitWidget({ configId, experienceId }: BookingkitW
       <div 
         className="w-full"
         style={{ 
-          backgroundColor: isDark ? '#020617' : '#ffffff',
-          borderRadius: '1.5rem',
+          backgroundColor: bgColor,
+          borderRadius: isInModal ? '0' : '1.5rem',
           overflow: 'hidden'
         }}
       >
         {isVisible && (
           <iframe
-            key={`${configId}-${experienceId}-${isDark}`}
+            key={`${configId}-${experienceId}-${isDark}-${isInModal}`}
             srcDoc={isolatedHtml}
             style={{ height: `${height}px`, width: '100%', border: 'none', overflow: 'hidden' }}
             onLoad={() => {

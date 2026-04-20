@@ -14,7 +14,7 @@ This document tracks which Bookingkit widgets are used on which pages of the Nex
 | `/kurse/longboard` | Longboard | `b6d9d93ab89272e6717a82f6519cd4e1` |
 | `/kurse/wingfoil` | Wing-Foilen | `19dcbc42fbc01b0eb7ff50cb207fb257` |
 | `/kurse/kids` | Kids und co | `8e77f4d5432a8f414be964dba3c28901` |
-| `/kurse/gruppen` | Schulen & Firmen | `58ae67a2678e690811b49a941b3adc19` (Schulen) <br> `5b9c9af9a951f17cbefdae5de113c854` (Firmen) |
+| `/gruppen/anfrage` | Schulen & Firmen | `58ae67a2678e690811b49a941b3adc19` (Schulen) <br> `5b9c9af9a951f17cbefdae5de113c854` (Firmen) |
 
 ## 3. Category: "Verleih" (Rentals)
 | Page | Widget Name | Config ID (`data-cw`) |

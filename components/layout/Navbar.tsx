@@ -12,7 +12,7 @@ const navLinks = [
   { name: 'SUP', href: '/kurse/sup' },
   { name: 'Longboard', href: '/kurse/longboard' },
   { name: 'Kids & Co', href: '/kurse/kids' },
-  { name: 'Schulen & Firmen', href: '/kurse/gruppen' },
+  { name: 'Schulen & Firmen', href: '/gruppen/anfrage' },
 ];
 
 interface NavbarProps {

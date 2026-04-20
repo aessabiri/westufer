@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Check, Wind } from 'lucide-react';
+import Image from 'next/image';
 
 import { FAQ } from './FAQ';
 
@@ -78,11 +79,11 @@ export function WindsurfContent() {
               </ul>
             </div>
             <div className="bg-slate-100 rounded-3xl h-[500px] overflow-hidden relative">
-                 <div 
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: "url('https://images.unsplash.com/photo-1528154109405-59c253406456?q=80&w=1287&auto=format&fit=crop')"
-                  }}
+                 <Image
+                    src="https://images.unsplash.com/photo-1528154109405-59c253406456?q=80&w=1287&auto=format&fit=crop"
+                    alt="Windsurfing Kemnader See"
+                    fill
+                    className="object-cover"
                  />
             </div>
           </div>

@@ -7,19 +7,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModeToggle } from '@/components/ui/ModeToggle';
 
-const kurseLinks = [
+const navLinks = [
   { name: 'Windsurfen', href: '/kurse/windsurf' },
   { name: 'SUP', href: '/kurse/sup' },
   { name: 'Longboard', href: '/kurse/longboard' },
-  { name: 'Wing-Foilen', href: '/kurse/wingfoil' },
   { name: 'Kids & Co', href: '/kurse/kids' },
   { name: 'Schulen & Firmen', href: '/kurse/gruppen' },
-];
-
-const verleihLinks = [
-  { name: 'Windsurf Verleih', href: '/verleih/windsurf' },
-  { name: 'SUP Verleih', href: '/verleih/sup' },
-  { name: 'Longboard Verleih', href: '/verleih/longboard' },
 ];
 
 interface NavbarProps {
@@ -29,7 +22,7 @@ interface NavbarProps {
 export function Navbar({ variant = 'home' }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,57 +56,27 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {/* Kurse Dropdown */}
+          {/* Combined Dropdown */}
           <div 
             className="relative group"
-            onMouseEnter={() => setActiveDropdown('kurse')}
-            onMouseLeave={() => setActiveDropdown(null)}
+            onMouseEnter={() => setActiveDropdown(true)}
+            onMouseLeave={() => setActiveDropdown(false)}
           >
             <button className={cn(
               "flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors py-2",
               isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
             )}>
-              Kurse <ChevronDown size={14} className={cn("transition-transform", activeDropdown === 'kurse' && "rotate-180")} />
+              Kurse & Verleih <ChevronDown size={14} className={cn("transition-transform", activeDropdown && "rotate-180")} />
             </button>
             <AnimatePresence>
-              {activeDropdown === 'kurse' && (
+              {activeDropdown && (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 w-48 bg-white dark:bg-slate-900 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-800 py-2 mt-2"
+                  className="absolute top-full left-0 w-56 bg-white dark:bg-slate-900 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-800 py-2 mt-2"
                 >
-                  {kurseLinks.map((link) => (
-                    <a key={link.name} href={link.href} className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-500 transition-colors">
-                      {link.name}
-                    </a>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Verleih Dropdown */}
-          <div 
-            className="relative group"
-            onMouseEnter={() => setActiveDropdown('verleih')}
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            <button className={cn(
-              "flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors py-2",
-              isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
-            )}>
-              Verleih <ChevronDown size={14} className={cn("transition-transform", activeDropdown === 'verleih' && "rotate-180")} />
-            </button>
-            <AnimatePresence>
-              {activeDropdown === 'verleih' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 w-48 bg-white dark:bg-slate-900 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-800 py-2 mt-2"
-                >
-                  {verleihLinks.map((link) => (
+                  {navLinks.map((link) => (
                     <a key={link.name} href={link.href} className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-500 transition-colors">
                       {link.name}
                     </a>
@@ -166,20 +129,10 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
             className="md:hidden bg-white dark:bg-slate-950 border-t dark:border-slate-800 max-h-[80vh] overflow-y-auto"
           >
             <div className="flex flex-col p-6 gap-6">
-              {/* Mobile Kurse */}
+              {/* Combined Mobile List */}
               <div className="space-y-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Kurse</p>
-                {kurseLinks.map((link) => (
-                  <a key={link.name} href={link.href} className="block text-lg font-medium text-slate-700 dark:text-slate-200" onClick={() => setIsOpen(false)}>
-                    {link.name}
-                  </a>
-                ))}
-              </div>
-
-              {/* Mobile Verleih */}
-              <div className="space-y-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Verleih</p>
-                {verleihLinks.map((link) => (
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Kurse & Verleih</p>
+                {navLinks.map((link) => (
                   <a key={link.name} href={link.href} className="block text-lg font-medium text-slate-700 dark:text-slate-200" onClick={() => setIsOpen(false)}>
                     {link.name}
                   </a>

@@ -30,6 +30,10 @@ export const metadata: Metadata = {
     locale: 'de_DE',
     type: 'website',
   },
+  icons: {
+    icon: '/logo/westuferlogo.png',
+    apple: '/logo/westuferlogo.png',
+  },
 };
 
 export default function RootLayout({

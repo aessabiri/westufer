@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -47,11 +48,19 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
         <Link 
           href="/" 
           className={cn(
-            "text-2xl font-black tracking-tighter transition-colors flex items-center gap-2",
+            "text-2xl font-black tracking-tighter transition-colors flex items-center gap-3",
             isSolid ? "text-slate-900 dark:text-white" : "text-white"
           )}
         >
-          WESTUFER
+          <div className="relative w-10 h-10 md:w-12 md:h-12">
+            <Image 
+              src="/logo/westuferlogo.png" 
+              alt="Westufer Logo" 
+              fill
+              className="object-contain"
+            />
+          </div>
+          <span className="hidden sm:block">WESTUFER</span>
         </Link>
 
         {/* Desktop Nav */}

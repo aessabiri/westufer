@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
 export function Footer() {
@@ -7,8 +8,18 @@ export function Footer() {
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="text-2xl font-bold tracking-tighter mb-4 block">
-              WESTUFER
+            <Link href="/" className="flex items-center gap-3 mb-6">
+              <div className="relative w-12 h-12">
+                <Image 
+                  src="/logo/westuferlogo.png" 
+                  alt="Westufer Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-2xl font-bold tracking-tighter">
+                WESTUFER
+              </span>
             </Link>
             <p className="text-slate-400 max-w-sm">
               Deine Surfschule am Kemnader See. Wir bringen dich aufs Wasser – mit Spaß, Sicherheit und professionellem Equipment.

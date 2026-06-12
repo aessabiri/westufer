@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 export function InfoHub() {
   return (
-    <section id="infos" className="relative py-24 bg-slate-950 overflow-hidden">
+    <section id="infos" className="relative py-24 bg-transparent overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-cyan-500/5 blur-[150px] pointer-events-none" />
 

@@ -39,7 +39,7 @@ const groups = [
 
 export function Groups() {
   return (
-    <section id="gruppen" className="py-24 bg-slate-950 text-white relative overflow-hidden">
+    <section id="gruppen" className="py-24 bg-transparent text-white relative overflow-hidden">
       {/* Dynamic Background Glows */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] -translate-x-1/2" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-600/10 rounded-full blur-[120px] translate-x-1/2" />

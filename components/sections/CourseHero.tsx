@@ -19,7 +19,7 @@ interface CourseHeroProps {
 
 export function CourseHero({ title, subtitle, image, stats }: CourseHeroProps) {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-slate-950">
+    <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-transparent">
       {/* Background Image with Cinematic Overlay */}
       <div className="absolute inset-0 z-0">
         <Image

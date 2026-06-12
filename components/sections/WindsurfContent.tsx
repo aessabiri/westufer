@@ -52,7 +52,7 @@ const toBring = [
 
 export function WindsurfContent() {
   return (
-    <div className="bg-slate-950">
+    <div className="bg-transparent">
       <CourseHero 
         title="Windsurf Einsteigerkurs"
         subtitle="Lerne Windsurfen in nur 2 Tagen. Dein Ticket in die Welt des Wassersports direkt am Kemnader See."

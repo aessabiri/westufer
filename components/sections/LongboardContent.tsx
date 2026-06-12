@@ -52,7 +52,7 @@ const toBring = [
 
 export function LongboardContent() {
   return (
-    <div className="bg-slate-950">
+    <div className="bg-transparent">
       <CourseHero 
         title="Longboard Einsteigerkurs"
         subtitle="Lerne sicher Rollen, Bremsen und Carven. Der perfekte Einstieg in die Welt des Asphaltsurfens am Kemnader See."

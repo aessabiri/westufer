@@ -52,7 +52,7 @@ const toBring = [
 
 export function SupContent() {
   return (
-    <div className="bg-slate-950">
+    <div className="bg-transparent">
       <CourseHero 
         title="SUP Einsteigerkurs"
         subtitle="Entdecke den Kemnader See vom Wasser aus. Lerne die richtige Technik für maximalen Spaß und Stabilität."

@@ -29,7 +29,7 @@ const vibeFeatures = [
 
 export function CommunityVibe() {
   return (
-    <section id="vibe" className="relative py-24 bg-slate-950 overflow-hidden">
+    <section id="vibe" className="relative py-24 bg-transparent overflow-hidden">
       {/* Dynamic Background Glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-500/10 rounded-full blur-[120px]" />
       <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl" />

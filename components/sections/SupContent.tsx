@@ -52,7 +52,7 @@ const toBring = [
 
 export function SupContent() {
   return (
-    <div className="bg-white dark:bg-slate-950">
+    <div className="bg-slate-950">
       <CourseHero 
         title="SUP Einsteigerkurs"
         subtitle="Entdecke den Kemnader See vom Wasser aus. Lerne die richtige Technik für maximalen Spaß und Stabilität."
@@ -60,18 +60,30 @@ export function SupContent() {
         stats={stats}
       />
 
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-1/2 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] translate-x-1/2" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">
-                Entspannung & Workout
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6"
+              >
+                <Waves size={14} />
+                Natur & Balance
+              </motion.div>
+              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-[0.9]">
+                Entspannung <br/><span className="text-blue-500">& Workout</span>
               </h2>
-              <div className="space-y-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <div className="space-y-6 text-xl text-slate-400 leading-relaxed font-medium">
                 <p>
                   Stand Up Paddling ist der ideale Sport für alle, die Natur und Bewegung kombinieren wollen. Es ist leicht zu erlernen, trainiert den ganzen Körper und bietet gleichzeitig eine unglaubliche Entspannung.
                 </p>
@@ -80,14 +92,18 @@ export function SupContent() {
                 </p>
               </div>
               
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <Waves className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Ruhiges Wasser</span>
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-blue-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                    <Waves size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Ruhiges Wasser</span>
                 </div>
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <Award className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Top Material</span>
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-blue-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                    <Award size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Top Material</span>
                 </div>
               </div>
             </motion.div>
@@ -96,14 +112,15 @@ export function SupContent() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
+              className="relative h-[650px] rounded-[3.5rem] overflow-hidden shadow-2xl border border-white/10"
             >
               <Image
                 src="https://images.unsplash.com/photo-1596522512683-11a3d9021669?q=80&w=2070&auto=format&fit=crop"
                 alt="SUP Einsteigerkurs"
                 fill
-                className="object-cover"
+                className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
             </motion.div>
           </div>
         </div>
@@ -115,7 +132,9 @@ export function SupContent() {
       />
 
       {/* FAQ Section */}
-      <FAQ items={supFAQ} />
+      <div className="bg-slate-950 pb-24">
+        <FAQ items={supFAQ} />
+      </div>
     </div>
   );
 }

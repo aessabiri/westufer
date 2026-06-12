@@ -52,7 +52,7 @@ const toBring = [
 
 export function LongboardContent() {
   return (
-    <div className="bg-white dark:bg-slate-950">
+    <div className="bg-slate-950">
       <CourseHero 
         title="Longboard Einsteigerkurs"
         subtitle="Lerne sicher Rollen, Bremsen und Carven. Der perfekte Einstieg in die Welt des Asphaltsurfens am Kemnader See."
@@ -60,18 +60,30 @@ export function LongboardContent() {
         stats={stats}
       />
 
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-1/2 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] -translate-x-1/2" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">
-                Cruisen auf Asphalt
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6"
+              >
+                <MapPin size={14} />
+                Cruising Lifestyle
+              </motion.div>
+              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-[0.9]">
+                Cruisen <br/><span className="text-emerald-500">auf Asphalt</span>
               </h2>
-              <div className="space-y-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <div className="space-y-6 text-xl text-slate-400 leading-relaxed font-medium">
                 <p>
                   Longboarden ist mehr als nur Rollen – es ist ein Lebensgefühl. Rund um den Kemnader See führt ein über 10 km langer, perfekt asphaltierter Weg, der wie gemacht ist für lange Turns und entspanntes Cruisen.
                 </p>
@@ -80,14 +92,18 @@ export function LongboardContent() {
                 </p>
               </div>
               
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <MapPin className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Seerundweg</span>
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-emerald-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                    <MapPin size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Seerundweg</span>
                 </div>
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <Award className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Safety First</span>
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-emerald-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                    <Award size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Safety First</span>
                 </div>
               </div>
             </motion.div>
@@ -96,14 +112,15 @@ export function LongboardContent() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
+              className="relative h-[650px] rounded-[3.5rem] overflow-hidden shadow-2xl border border-white/10"
             >
               <Image
                 src="https://images.unsplash.com/photo-1536796038751-bb018f95ca01?q=80&w=800&auto=format&fit=crop"
                 alt="Longboard Einsteigerkurs"
                 fill
-                className="object-cover"
+                className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
             </motion.div>
           </div>
         </div>
@@ -115,7 +132,9 @@ export function LongboardContent() {
       />
 
       {/* FAQ Section */}
-      <FAQ items={longboardFAQ} />
+      <div className="bg-slate-950 pb-24">
+        <FAQ items={longboardFAQ} />
+      </div>
     </div>
   );
 }

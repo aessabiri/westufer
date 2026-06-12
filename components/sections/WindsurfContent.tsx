@@ -52,7 +52,7 @@ const toBring = [
 
 export function WindsurfContent() {
   return (
-    <div className="bg-white dark:bg-slate-950">
+    <div className="bg-slate-950">
       <CourseHero 
         title="Windsurf Einsteigerkurs"
         subtitle="Lerne Windsurfen in nur 2 Tagen. Dein Ticket in die Welt des Wassersports direkt am Kemnader See."
@@ -60,18 +60,30 @@ export function WindsurfContent() {
         stats={stats}
       />
 
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      <section className="relative py-24 overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-1/2 left-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px] -translate-x-1/2" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">
-                Dein Start auf dem Wasser
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6"
+              >
+                <Wind size={14} />
+                Der perfekte Start
+              </motion.div>
+              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-[0.9]">
+                Dein Start <br/><span className="text-cyan-500">auf dem Wasser</span>
               </h2>
-              <div className="space-y-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+              <div className="space-y-6 text-xl text-slate-400 leading-relaxed font-medium">
                 <p>
                   Windsurfen ist pure Freiheit. Mit unserem Einsteigerkurs am Kemnader See legen wir den Grundstein für deine Surf-Karriere. In 12 Stunden lernst du alles, was du brauchst, um sicher und mit Spaß über den See zu gleiten.
                 </p>
@@ -80,14 +92,18 @@ export function WindsurfContent() {
                 </p>
               </div>
               
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <Wind className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Konstante Winde</span>
+              <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-cyan-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <Wind size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Konstante Winde</span>
                 </div>
-                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  <Award className="text-cyan-500" />
-                  <span className="font-bold text-slate-900 dark:text-white">Profi-Coaching</span>
+                <div className="flex items-center gap-4 p-6 bg-white/5 border border-white/10 rounded-[2rem] backdrop-blur-xl group hover:border-cyan-500/30 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
+                    <Award size={24} />
+                  </div>
+                  <span className="font-bold text-white tracking-tight">Profi-Coaching</span>
                 </div>
               </div>
             </motion.div>
@@ -96,14 +112,15 @@ export function WindsurfContent() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
+              className="relative h-[650px] rounded-[3.5rem] overflow-hidden shadow-2xl border border-white/10"
             >
               <Image
                 src="https://images.unsplash.com/photo-1528154109405-59c253406456?q=80&w=1287&auto=format&fit=crop"
                 alt="Windsurfing Einsteigerkurs"
                 fill
-                className="object-cover"
+                className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-1000"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
             </motion.div>
           </div>
         </div>
@@ -115,7 +132,9 @@ export function WindsurfContent() {
       />
 
       {/* FAQ Section */}
-      <FAQ items={windsurfFAQ} />
+      <div className="bg-slate-950 pb-24">
+        <FAQ items={windsurfFAQ} />
+      </div>
     </div>
   );
 }

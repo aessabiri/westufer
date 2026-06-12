@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Waves } from 'lucide-react';
 import BookingkitWidget from '@/components/features/BookingkitWidget';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -63,19 +63,32 @@ export function AdventureCarousel() {
   };
 
   return (
-    <section className="py-24 bg-white dark:bg-slate-950 overflow-hidden relative">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-            Wähle dein Abenteuer
+    <section className="py-24 bg-slate-950 overflow-hidden relative">
+      {/* Dynamic Background Glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6"
+          >
+            <Waves size={14} />
+            Wähle dein Erlebnis
+          </motion.div>
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter leading-[0.9]">
+            Wähle dein <br/><span className="text-cyan-500">Abenteuer</span>
           </h2>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Von 25 individuellen Erlebnissen ist garantiert auch das Richtige für dich dabei.
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+            Von 25 individuellen Erlebnissen ist garantiert auch das Richtige für dich dabei. Wir bringen dich aufs Wasser.
           </p>
         </div>
 
         <div className="relative max-w-7xl mx-auto">
-          <div className="relative h-[550px] flex items-center justify-center overflow-visible">
+          <div className="relative h-[600px] flex items-center justify-center overflow-visible">
             <AnimatePresence initial={false} mode="popLayout">
               {getVisibleAdventures().map((item, i) => {
                 const isCenter = item.position === 1;
@@ -88,47 +101,47 @@ export function AdventureCarousel() {
                     key={`${item.experienceId}-${item.id}`}
                     initial={{ opacity: 0, x: item.position > 1 ? 100 : -100, scale: 0.8 }}
                     animate={{ 
-                        opacity: isCenter ? 1 : 0.6, 
-                        x: (item.position - 1) * (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 400), 
-                        scale: isCenter ? 1 : 0.9,
+                        opacity: isCenter ? 1 : 0.4, 
+                        x: (item.position - 1) * (typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 420), 
+                        scale: isCenter ? 1 : 0.85,
                         zIndex: isCenter ? 20 : 10
                     }}
                     exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                    className="absolute w-[300px] md:w-[350px] shrink-0"
+                    transition={{ type: "spring", stiffness: 150, damping: 25 }}
+                    className="absolute w-[320px] md:w-[380px] shrink-0"
                   >
                     <div className={cn(
-                      "relative h-[480px] rounded-[3rem] overflow-hidden shadow-2xl bg-slate-900 border-4 transition-all duration-700",
-                      isCenter ? "border-cyan-500" : "border-transparent"
+                      "relative h-[520px] rounded-[3.5rem] overflow-hidden shadow-2xl bg-white/5 border transition-all duration-700 backdrop-blur-xl",
+                      isCenter ? "border-cyan-500 shadow-cyan-500/20 scale-105" : "border-white/10 scale-95"
                     )}>
                       <Image 
                         src={item.image} 
                         alt={item.name} 
                         fill 
-                        sizes="(max-width: 768px) 300px, 350px"
-                        className="object-cover opacity-60" 
+                        sizes="(max-width: 768px) 320px, 380px"
+                        className="object-cover opacity-70 group-hover:scale-110 transition-transform duration-700" 
                         priority={isCenter}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
                       
-                      <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 mb-2 block">
+                      <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400 mb-3 block">
                           {item.category}
                         </span>
-                        <h3 className="text-2xl font-bold mb-2 leading-tight">{item.name}</h3>
-                        <p className="text-sm text-slate-300 mb-6 line-clamp-2">{item.description}</p>
+                        <h3 className="text-3xl font-bold mb-3 leading-[1.1] tracking-tight">{item.name}</h3>
+                        <p className="text-slate-400 text-sm mb-8 line-clamp-2 font-medium leading-relaxed">{item.description}</p>
                         
-                        <div className="flex items-center justify-between">
-                          <div className="font-bold text-xl">
-                            <span className="text-slate-400 text-sm font-medium mr-1">ab</span>
+                        <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                          <div className="font-black text-2xl">
+                            <span className="text-slate-500 text-xs font-bold uppercase tracking-widest mr-2">Ab</span>
                             {item.price}
                           </div>
                           {isCenter && (
                             <button 
                               onClick={() => setSelectedAdventure(item)}
-                              className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-6 py-3 rounded-full font-bold text-sm transition-all active:scale-95 shadow-lg shadow-cyan-500/20"
+                              className="bg-white text-slate-950 px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-xl"
                             >
-                              Jetzt Buchen
+                              Buchen
                             </button>
                           )}
                         </div>

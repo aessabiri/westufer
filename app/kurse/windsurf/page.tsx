@@ -19,7 +19,7 @@ export default function WindsurfPage() {
       <WindsurfContent />
 
       {/* Dedicated Booking Section */}
-      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+      <section id="booking" className="py-20 bg-slate-50 dark:bg-slate-900/50">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
@@ -29,7 +29,10 @@ export default function WindsurfPage() {
               Wähle deinen passenden Termin und starte dein Abenteuer auf dem Wasser.
             </p>
           </div>
-          <BookingkitWidget configId="1253e1a9a19995e6966cf2bf6d4dbd36" />
+          <BookingkitWidget 
+            configId="51bdc608442c342ef82a1ac41cf65754" 
+            experienceId="40939dc555a2a3238f185253008c2896" 
+          />
         </div>
       </section>
 

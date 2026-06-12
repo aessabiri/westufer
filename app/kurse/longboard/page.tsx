@@ -19,7 +19,7 @@ export default function LongboardPage() {
       <LongboardContent />
 
       {/* Dedicated Booking Section */}
-      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+      <section id="booking" className="py-20 bg-slate-50 dark:bg-slate-900/50">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
@@ -29,7 +29,10 @@ export default function LongboardPage() {
               Reserviere dein Board für die nächste Seerunde oder buche einen Workshop.
             </p>
           </div>
-          <BookingkitWidget configId="b6d9d93ab89272e6717a82f6519cd4e1" />
+          <BookingkitWidget 
+            configId="51bdc608442c342ef82a1ac41cf65754" 
+            experienceId="c0f63e246e711ab75024f57d65acd5ca" 
+          />
         </div>
       </section>
 

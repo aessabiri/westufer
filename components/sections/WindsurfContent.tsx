@@ -1,97 +1,121 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Wind } from 'lucide-react';
+import { Check, Wind, Clock, Tag, Award, Users } from 'lucide-react';
 import Image from 'next/image';
 
 import { FAQ } from './FAQ';
+import { CourseHero } from './CourseHero';
+import { CourseQuickInfo } from './CourseQuickInfo';
 
 const windsurfFAQ = [
   {
-    question: "Brauche ich Vorkenntnisse?",
-    answer: "Nein, für unseren Schnupperkurs und den Grundschein brauchst du keinerlei Vorkenntnisse. Wir fangen bei null an. Schwimmen solltest du aber sicher können (mind. 15 Minuten am Stück)."
+    question: "Brauche ich Vorkenntnisse für den Einsteigerkurs?",
+    answer: "Nein, unser Einsteigerkurs ist genau dafür da! Wir fangen bei den absoluten Grundlagen an: Materialkunde, Aufsteigen, Starten und die ersten Meter fahren. Schwimmen solltest du aber sicher können (mind. 15 Minuten am Stück)."
   },
   {
-    question: "Was muss ich mitbringen?",
-    answer: "Badebekleidung, Handtuch und Sonnencreme reichen völlig aus. Neoprenanzüge, Schuhe und das gesamte Surfmaterial stellen wir dir zur Verfügung."
+    question: "Wie lange dauert der Einsteigerkurs?",
+    answer: "Der Kurs geht über zwei Tage mit insgesamt 12 Unterrichtsstunden. Das ist die ideale Zeit, um ein solides Fundament zu legen und sicher alleine auf dem Wasser klarzukommen."
   },
   {
-    question: "Findet der Kurs auch bei Regen statt?",
-    answer: "Ja, nass wirst du sowieso! :-) Wir schulen bei fast jedem Wetter, solange kein Gewitter oder Sturm gemeldet ist. Bei gefährlichen Bedingungen verschieben wir den Kurs natürlich kostenlos."
+    question: "Bekomme ich eine Lizenz?",
+    answer: "Ja, am Ende des Kurses kannst du die Prüfung für den VDWS-Grundschein ablegen. Dieser ist weltweit anerkannt und ermöglicht dir das Ausleihen von Material an fast jeder Surfstation."
   },
   {
-    question: "Ist der Grundschein international anerkannt?",
-    answer: "Ja, der VDWS-Grundschein ist weltweit anerkannt. Damit kannst du dir im Urlaub fast überall Material ausleihen."
+    question: "Was passiert bei schlechtem Wetter?",
+    answer: "Windsurfen ist ein Outdoorsport. Wir schulen auch bei Regen – nass wirst du sowieso! Bei Gewitter oder Sturm verschieben wir den Kurs aus Sicherheitsgründen natürlich kostenlos."
   }
+];
+
+const stats = [
+  { icon: Clock, label: "Dauer", value: "2 Tage (12h)" },
+  { icon: Tag, label: "Preis", value: "195 €" },
+  { icon: Award, label: "Lizenz", value: "VDWS möglich" },
+  { icon: Users, label: "Alter", value: "ab 7 Jahren" }
+];
+
+const included = [
+  "Komplette Windsurfausrüstung (Board & Rigg)",
+  "Hochwertiger Neoprenanzug",
+  "VDWS-lizenzierte Surflehrer",
+  "Kleine Gruppen (max. 8 Personen)",
+  "Nutzung der sanitären Anlagen & Duschen"
+];
+
+const toBring = [
+  "Badebekleidung für unter den Neopren",
+  "Handtuch & Duschzeug",
+  "Sonnencreme (auch bei Bewölkung)",
+  "Alte Turnschuhe oder Surfschuhe (falls vorhanden)",
+  "Viel gute Laune!"
 ];
 
 export function WindsurfContent() {
   return (
-    <>
-      {/* Hero */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1599405758676-66412adbe26e?q=80&w=2000&auto=format&fit=crop')",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        >
-          <div className="absolute inset-0 bg-blue-900/60" />
-        </div>
-        <div className="relative z-10 container mx-auto px-6 text-center text-white">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-bold mb-6"
-          >
-            Windsurfen
-          </motion.h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto font-light">
-            Spüre die Kraft des Windes. Die Trend-Sportart am Kemnader See.
-          </p>
-        </div>
-      </section>
+    <div className="bg-white dark:bg-slate-950">
+      <CourseHero 
+        title="Windsurf Einsteigerkurs"
+        subtitle="Lerne Windsurfen in nur 2 Tagen. Dein Ticket in die Welt des Wassersports direkt am Kemnader See."
+        image="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=2000&auto=format&fit=crop"
+        stats={stats}
+      />
 
-      {/* Content */}
-      <section className="py-20">
+      <section className="py-24">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
-            <div>
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-8">
-                <Wind size={32} />
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">
+                Dein Start auf dem Wasser
+              </h2>
+              <div className="space-y-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                <p>
+                  Windsurfen ist pure Freiheit. Mit unserem Einsteigerkurs am Kemnader See legen wir den Grundstein für deine Surf-Karriere. In 12 Stunden lernst du alles, was du brauchst, um sicher und mit Spaß über den See zu gleiten.
+                </p>
+                <p>
+                  Unser Revier bietet mit seinem flachen Wasser und konstanten Winden die perfekten Bedingungen für Anfänger. Keine Wellen, keine Strömung – einfach nur Platz zum Üben.
+                </p>
               </div>
-              <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">Der perfekte Einstieg</h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
-                Unser Revier bietet optimale Bedingungen für Einsteiger und Aufsteiger. 
-                Flaches Wasser und konstante Winde machen das Lernen einfach und sicher. 
-                Unsere lizenzierten VDWS-Instructor begleiten dich von den ersten Schritten 
-                auf dem Board bis zum Gleiten.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {['VDWS-Lizenzierte Surfschule', 'Neuestes Material von Top-Marken', 'Kleine Gruppen für maximalen Lernerfolg', 'Neoprenanzüge inklusive'].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-slate-700 font-medium">
-                    <Check className="text-green-500" size={20} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-slate-100 rounded-3xl h-[500px] overflow-hidden relative">
-                 <Image
-                    src="https://images.unsplash.com/photo-1528154109405-59c253406456?q=80&w=1287&auto=format&fit=crop"
-                    alt="Windsurfing Kemnader See"
-                    fill
-                    className="object-cover"
-                 />
-            </div>
+              
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
+                  <Wind className="text-cyan-500" />
+                  <span className="font-bold text-slate-900 dark:text-white">Konstante Winde</span>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
+                  <Award className="text-cyan-500" />
+                  <span className="font-bold text-slate-900 dark:text-white">Profi-Coaching</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
+            >
+              <Image
+                src="https://images.unsplash.com/photo-1528154109405-59c253406456?q=80&w=1287&auto=format&fit=crop"
+                alt="Windsurfing Einsteigerkurs"
+                fill
+                className="object-cover"
+              />
+            </motion.div>
           </div>
         </div>
       </section>
 
+      <CourseQuickInfo 
+        included={included}
+        toBring={toBring}
+      />
+
       {/* FAQ Section */}
       <FAQ items={windsurfFAQ} />
-    </>
+    </div>
   );
 }

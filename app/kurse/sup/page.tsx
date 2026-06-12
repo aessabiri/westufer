@@ -19,7 +19,7 @@ export default function SupPage() {
       <SupContent />
 
       {/* Dedicated Booking Section */}
-      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+      <section id="booking" className="py-20 bg-slate-50 dark:bg-slate-900/50">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
@@ -29,7 +29,10 @@ export default function SupPage() {
               Miete ein Board oder buche einen unserer beliebten Kurse direkt online.
             </p>
           </div>
-          <BookingkitWidget configId="7c5de4913df06914b1822818f8b69afd" />
+          <BookingkitWidget 
+            configId="51bdc608442c342ef82a1ac41cf65754" 
+            experienceId="f701a2f3aec2462ead853b82b2df1c25" 
+          />
         </div>
       </section>
 

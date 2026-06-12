@@ -3,17 +3,36 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, Wind, Waves, MapPin, Baby, Heart, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModeToggle } from '@/components/ui/ModeToggle';
 
-const navLinks = [
-  { name: 'Windsurfen', href: '/kurse/windsurf' },
-  { name: 'SUP', href: '/kurse/sup' },
-  { name: 'Longboard', href: '/kurse/longboard' },
-  { name: 'Kids & Co', href: '/kurse/kids' },
-  { name: 'Schulen & Firmen', href: '/gruppen/anfrage' },
+const courseCategories = [
+  { 
+    name: 'Windsurfen', 
+    icon: Wind, 
+    href: '/kurse/windsurf',
+    items: ['Einsteigerkurs', 'Aufsteigerkurs', 'Schnupperkurs', 'Privatstunden']
+  },
+  { 
+    name: 'SUP', 
+    icon: Waves, 
+    href: '/kurse/sup',
+    items: ['Einsteigerkurs', 'Aufsteigerkurs', 'Yoga & Fitness', 'Touren']
+  },
+  { 
+    name: 'Longboard', 
+    icon: MapPin, 
+    href: '/kurse/longboard',
+    items: ['Einsteigerkurs', 'Workshops', 'Verleih']
+  },
+  { 
+    name: 'Kids & Co', 
+    icon: Baby, 
+    href: '/kurse/kids',
+    items: ['Feriencamps', 'Kindergeburtstage', 'Schulangebote']
+  },
 ];
 
 interface NavbarProps {
@@ -23,7 +42,7 @@ interface NavbarProps {
 export function Navbar({ variant = 'home' }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<boolean>(false);
+  const [activeDropdown, setActiveDropdown] = useState<'kurse' | 'team' | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,40 +84,78 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {/* Combined Dropdown */}
+          {/* Kurse Dropdown */}
           <div 
-            className="relative group"
-            onMouseEnter={() => setActiveDropdown(true)}
-            onMouseLeave={() => setActiveDropdown(false)}
+            className="relative"
+            onMouseEnter={() => setActiveDropdown('kurse')}
+            onMouseLeave={() => setActiveDropdown(null)}
           >
-            <button className={cn(
-              "flex items-center gap-1 text-sm font-medium tracking-wide uppercase transition-colors py-2",
-              isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
-            )}>
-              Kurse & Verleih <ChevronDown size={14} className={cn("transition-transform", activeDropdown && "rotate-180")} />
-            </button>
+            <Link 
+              href="/kurse"
+              className={cn(
+                "flex items-center gap-1 text-sm font-bold tracking-wide uppercase transition-colors py-2",
+                isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90",
+                activeDropdown === 'kurse' && "text-cyan-500"
+              )}
+            >
+              Kurse <ChevronDown size={14} className={cn("transition-transform", activeDropdown === 'kurse' && "rotate-180")} />
+            </Link>
             <AnimatePresence>
-              {activeDropdown && (
+              {activeDropdown === 'kurse' && (
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 w-56 bg-white dark:bg-slate-900 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-800 py-2 mt-2"
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute top-full -left-20 w-[640px] bg-white dark:bg-slate-900 shadow-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 mt-2 grid grid-cols-2 gap-x-12 gap-y-8"
                 >
-                  {navLinks.map((link) => (
-                    <a key={link.name} href={link.href} className="block px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-cyan-500 transition-colors">
-                      {link.name}
-                    </a>
+                  {courseCategories.map((cat) => (
+                    <div key={cat.name} className="space-y-4">
+                      <Link 
+                        href={cat.href}
+                        className="flex items-center gap-3 text-slate-900 dark:text-white group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <cat.icon size={20} />
+                        </div>
+                        <span className="font-bold text-lg">{cat.name}</span>
+                      </Link>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 pl-13">
+                        {cat.items.map((item, idx) => (
+                          <Link 
+                            key={item} 
+                            href={cat.href}
+                            className="text-xs text-slate-500 dark:text-slate-400 hover:text-cyan-500 transition-colors flex items-center gap-2"
+                          >
+                            <span className="w-1 h-1 rounded-full bg-cyan-500/50" />
+                            <span className="font-medium">Lvl {idx + 1}:</span> {item}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <a href="/gutscheine" className={cn(
-            "text-sm font-medium tracking-wide uppercase hover:text-cyan-500 transition-colors",
+          <Link href="/gutscheine" className={cn(
+            "text-sm font-bold tracking-wide uppercase hover:text-cyan-500 transition-colors",
             isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
-          )}>Gutscheine</a>
+          )}>Gutscheine</Link>
+
+          <Link href="/#vibe" className={cn(
+            "text-sm font-bold tracking-wide uppercase hover:text-cyan-500 transition-colors flex items-center gap-1",
+            isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
+          )}>
+            Vibe <Flame size={14} className="text-orange-500 fill-orange-500" />
+          </Link>
+
+          <Link href="/team" className={cn(
+            "text-sm font-bold tracking-wide uppercase hover:text-cyan-500 transition-colors flex items-center gap-1",
+            isSolid ? "text-slate-600 dark:text-slate-300" : "text-white/90"
+          )}>
+            Crew <Heart size={14} className="text-red-500 fill-red-500" />
+          </Link>
 
           <ModeToggle />
           <a
@@ -138,23 +195,39 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
             className="md:hidden bg-white dark:bg-slate-950 border-t dark:border-slate-800 max-h-[80vh] overflow-y-auto"
           >
             <div className="flex flex-col p-6 gap-6">
-              {/* Combined Mobile List */}
-              <div className="space-y-3">
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Kurse & Verleih</p>
-                {navLinks.map((link) => (
-                  <a key={link.name} href={link.href} className="block text-lg font-medium text-slate-700 dark:text-slate-200" onClick={() => setIsOpen(false)}>
-                    {link.name}
-                  </a>
-                ))}
-              </div>
+              {courseCategories.map((cat) => (
+                <div key={cat.name} className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                    <cat.icon size={14} /> {cat.name}
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 pl-4">
+                    {cat.items.map(item => (
+                      <Link 
+                        key={item} 
+                        href={cat.href} 
+                        className="text-lg font-medium text-slate-700 dark:text-slate-200"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {item}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
 
               <div className="pt-4 border-t dark:border-slate-800 space-y-4">
-                <a href="/gutscheine" className="block text-lg font-medium text-slate-700 dark:text-slate-200" onClick={() => setIsOpen(false)}>
+                <Link href="/gutscheine" className="block text-lg font-bold text-slate-700 dark:text-slate-200" onClick={() => setIsOpen(false)}>
                   Gutscheine
-                </a>
-                <a href="/booking" className="bg-cyan-500 text-white text-center py-3 rounded-xl font-bold block" onClick={() => setIsOpen(false)}>
+                </Link>
+                <Link href="/#vibe" className="block text-lg font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2" onClick={() => setIsOpen(false)}>
+                  Vibe <Flame size={18} className="text-orange-500 fill-orange-500" />
+                </Link>
+                <Link href="/team" className="block text-lg font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2" onClick={() => setIsOpen(false)}>
+                  Crew <Heart size={18} className="text-red-500 fill-red-500" />
+                </Link>
+                <Link href="/booking" className="bg-cyan-500 text-white text-center py-3 rounded-xl font-bold block" onClick={() => setIsOpen(false)}>
                   Jetzt Buchen
-                </a>
+                </Link>
               </div>
             </div>
           </motion.div>

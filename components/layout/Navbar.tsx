@@ -119,15 +119,16 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
                         </div>
                         <span className="font-bold text-lg">{cat.name}</span>
                       </Link>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 pl-13">
+                      <div className="space-y-2 pl-12">
                         {cat.items.map((item, idx) => (
                           <Link 
                             key={item} 
                             href={cat.href}
-                            className="text-xs text-slate-500 dark:text-slate-400 hover:text-cyan-500 transition-colors flex items-center gap-2"
+                            className="text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-500 transition-colors flex items-center gap-2"
                           >
-                            <span className="w-1 h-1 rounded-full bg-cyan-500/50" />
-                            <span className="font-medium">Lvl {idx + 1}:</span> {item}
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/30" />
+                            <span className="font-bold text-[10px] uppercase tracking-wider text-slate-400">Lvl {idx + 1}</span> 
+                            <span>{item}</span>
                           </Link>
                         ))}
                       </div>
@@ -200,14 +201,15 @@ export function Navbar({ variant = 'home' }: NavbarProps) {
                   <p className="text-xs font-bold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                     <cat.icon size={14} /> {cat.name}
                   </p>
-                  <div className="grid grid-cols-1 gap-2 pl-4">
-                    {cat.items.map(item => (
+                  <div className="grid grid-cols-1 gap-3 pl-4">
+                    {cat.items.map((item, idx) => (
                       <Link 
                         key={item} 
                         href={cat.href} 
-                        className="text-lg font-medium text-slate-700 dark:text-slate-200"
+                        className="text-lg font-medium text-slate-700 dark:text-slate-200 flex items-center gap-3"
                         onClick={() => setIsOpen(false)}
                       >
+                        <span className="text-[10px] font-black bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 uppercase">Lvl {idx + 1}</span>
                         {item}
                       </Link>
                     ))}
